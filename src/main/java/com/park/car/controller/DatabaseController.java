@@ -1,5 +1,6 @@
 package com.park.car.controller;
 
+import com.park.car.model.Space;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,9 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
 @Controller
 @RequestMapping("/jdbc")
 public class DatabaseController {
@@ -27,23 +26,21 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/example")
     public @ResponseBody
-    Map<String, String> example(ModelMap modelMap){
+    ArrayList<Space> example(ModelMap modelMap){
 
-        String sql = "select name from place where id=1";
-       // String sql = "select age from data where No=1";
+        String sql = "select * from space";
         Connection connection = null;
-        Map<String, String> mapa = new HashMap<String, String>();
+        ArrayList<Space> mapa = new ArrayList<Space>();
         try {
-            System.out.print(dataSource.toString());
             connection = dataSource.getConnection();
-            System.out.print(dataSource.toString());
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                mapa.put("String", rs.getString("name"));
-                //mapa.put("String", rs.getInt("age"));
+            while (rs.next()) {
+                Space space = new Space(rs.getInt("id"),rs.getString("place"),rs.getString("state"),rs.getInt("floor_id"));
+                mapa.add(space);
             }
+            System.out.print(mapa.size());
             modelMap.addAttribute("mapa", mapa);
             rs.close();
             ps.close();
