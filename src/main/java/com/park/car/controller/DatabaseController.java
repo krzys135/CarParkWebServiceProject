@@ -1,6 +1,6 @@
 package com.park.car.controller;
 
-import com.park.car.model.Registration;
+import com.park.car.model.Reg;
 import com.park.car.model.Resp;
 import com.park.car.model.Space;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 @Controller
 @RequestMapping("/jdbc")
 public class DatabaseController {
@@ -55,15 +56,25 @@ public class DatabaseController {
         }
 
     @RequestMapping(method = RequestMethod.POST, value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Resp register(@RequestBody final Registration registration){
-        String sql = "call addUser (null,'"+registration.getEmail()+"', MD5('"+registration.getPassword()+"'), '', '')";
+    @ResponseBody
+    public Resp reg(@RequestBody final Reg reg){
+        String message = new String();
+        String sql = "call addUser (null,'"+reg.getE()+"', MD5('"+reg.getP()+"'), '', '')";
+        String sqlResponse = "SELECT * FROM user WHERE email = '"+reg.getE()+"' AND sysdate() between validfrom and validto";
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.executeUpdate();
-            ps.close();
+            PreparedStatement psR = connection.prepareStatement(sqlResponse);
+            ResultSet resultSet = psR.executeQuery();
+            if (!resultSet.next()){
+                ps.executeUpdate();
+                ps.close();
+                message = "Utworzono użytkownika";
+            } else {
+                message = "Taki użytkonik istnieje";
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -73,8 +84,9 @@ public class DatabaseController {
                 } catch (SQLException e) {}
             }
         }
-        return null;
+        Resp resp = new Resp();
+        resp.setMessage(message);
+        return resp;
     }
-
 
 }
