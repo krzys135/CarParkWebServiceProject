@@ -3,11 +3,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title></title>
+    <title>dupa</title>
 </head>
 <body>
 <c:forEach items="${mapa}" var="object">
-    <p>${object}</p>
+    <p>Miejsce: ${object.place}, stan: ${object.state}</p>
 </c:forEach>
 </body>
 </html>
