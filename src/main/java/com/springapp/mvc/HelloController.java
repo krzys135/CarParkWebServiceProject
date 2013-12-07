@@ -3,6 +3,7 @@ package com.springapp.mvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.park.car.service.Emial;
+import com.park.car.service.Resp;
 import com.springapp.mvc.service.ExampleService;
 import com.sun.istack.internal.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -59,10 +62,18 @@ public class HelloController {
         return emial;
     }
 
-    @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String dateTime(@RequestBody final Emial emial){
-        String text ="JSON odebrany:";
-        return text;
+    public Resp dateTime(@RequestBody final Emial emial){
+        /*Emial emial1 = new Emial();
+        Date date = Date.valueOf("2013-12-05");
+        Time time = Time.valueOf("20:22:00");
+        emial.setEmial("sss@sdfasdf.pl");
+        emial.setDate(date);
+        emial.setTime(time);*/
+        Resp resp = new Resp();
+        //String result = new String("Witam "+ emial.getEmial());
+        resp.setMessage("Witam "+ emial.getEmial() + "Data: " + emial.getDate() + "Time: " + emial.getTime());
+        return resp;
     }
 }
