@@ -26,12 +26,13 @@ public class DatabaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/example")
-    public /*@ResponseBody*/ String example(ModelMap modelMap){
+    public @ResponseBody
+    Map<String, String> example(ModelMap modelMap){
 
-       // String sql = "select name from place where id=1";
-        String sql = "select age from data where No=1";
+        String sql = "select name from place where id=1";
+       // String sql = "select age from data where No=1";
         Connection connection = null;
-        Map<String, Integer> mapa = new HashMap<String, Integer>();
+        Map<String, String> mapa = new HashMap<String, String>();
         try {
             System.out.print(dataSource.toString());
             connection = dataSource.getConnection();
@@ -40,8 +41,8 @@ public class DatabaseController {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                //mapa.put("String", rs.getString("name"));
-                mapa.put("String", rs.getInt("age"));
+                mapa.put("String", rs.getString("name"));
+                //mapa.put("String", rs.getInt("age"));
             }
             modelMap.addAttribute("mapa", mapa);
             rs.close();
@@ -49,6 +50,6 @@ public class DatabaseController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "samplepage";
+        return mapa;
         }
 }
