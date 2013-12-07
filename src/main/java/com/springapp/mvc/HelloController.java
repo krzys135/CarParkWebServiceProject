@@ -11,6 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +23,12 @@ import java.util.Map;
 public class HelloController {
     @Autowired
     private ExampleService exampleService;
+
+    @Autowired
+    private DataSource dataSource;
+    public void setDataSource(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String printWelcome(ModelMap model) {
@@ -59,15 +69,29 @@ public class HelloController {
     @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Resp dateTime(@RequestBody final Emial emial){
-        /*Emial emial1 = new Emial();
-        Date date = Date.valueOf("2013-12-05");
-        Time time = Time.valueOf("20:22:00");
-        emial.setEmial("sss@sdfasdf.pl");
-        emial.setDate(date);
-        emial.setTime(time);*/
+
+        String sql = "call addUser (null,'"+emial.getEmial()+"', MD5('"+"55555"+"'), '', '')";
+        Connection connection = null;
+        System.out.print(sql);
+
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {}
+            }
+        }
+
         Resp resp = new Resp();
-        //String result = new String("Witam "+ emial.getEmial());
         resp.setMessage("Witam "+ emial.getEmial() + "Data: " + emial.getDate() + "Time: " + emial.getTime());
+        //resp.setMessage("Poszlo");
         return resp;
     }
 }
