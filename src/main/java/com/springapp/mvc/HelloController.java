@@ -2,22 +2,16 @@ package com.springapp.mvc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.park.car.service.Emial;
-import com.park.car.service.Resp;
+import com.park.car.model.Emial;
+import com.park.car.model.Resp;
 import com.springapp.mvc.service.ExampleService;
-import com.sun.istack.internal.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
-import java.sql.Date;
-import java.sql.Time;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller

@@ -1,4 +1,4 @@
-package com.park.car.service;
+package com.park.car.model;
 
 public class Resp {
 

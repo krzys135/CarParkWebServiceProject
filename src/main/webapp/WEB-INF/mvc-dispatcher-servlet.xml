@@ -9,6 +9,7 @@
     <context:component-scan base-package="com.springapp.mvc"/>
     <context:component-scan base-package="com.park.car"/>
     <mvc:annotation-driven/>
+    <import resource="database/Datasource.xml"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
@@ -39,6 +40,5 @@
     <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="supportedMediaTypes" value="application/json"/>
     </bean>
-
 
 </beans>
