@@ -3,7 +3,7 @@ package com.springapp.mvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.park.car.model.Emial;
-import com.park.car.model.Resp;
+import com.park.car.model.ResponseModel;
 import com.springapp.mvc.service.ExampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,7 +37,7 @@ public class HelloController {
     }
     @RequestMapping(method = RequestMethod.GET, value = "/hello")
     public @ResponseBody
-    String hello(@RequestParam(required = false) String miejsce) throws JsonProcessingException {
+    String hello(@RequestParam(required = false) String miejsce, String dupa) throws JsonProcessingException {
         Map<String, String> mapa = new HashMap<String, String>();
         mapa.put("email", "xrysiek@wp.pl");
        /// mapa.put("kwota", "11");
@@ -45,6 +45,7 @@ public class HelloController {
 
         if (miejsce != null) {
             mapa.put("miejsce", miejsce);
+            mapa.put("dupa", dupa);
         }
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(mapa);
@@ -68,7 +69,7 @@ public class HelloController {
 
     @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Resp dateTime(@RequestBody final Emial emial){
+    public ResponseModel dateTime(@RequestBody final Emial emial){
 
         String sql = "call addUser (null,'"+emial.getEmial()+"', MD5('"+"55555"+"'), '', '')";
         Connection connection = null;
@@ -89,9 +90,9 @@ public class HelloController {
             }
         }
 
-        Resp resp = new Resp();
-        resp.setMessage("Witam "+ emial.getEmial() + "Data: " + emial.getDate() + "Time: " + emial.getTime());
-        //resp.setMessage("Poszlo");
-        return resp;
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage("Witam "+ emial.getEmial() + "Data: " + emial.getDate() + "Time: " + emial.getTime());
+        //responseModel.setMessage("Poszlo");
+        return responseModel;
     }
 }

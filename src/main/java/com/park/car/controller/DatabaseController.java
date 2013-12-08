@@ -1,8 +1,8 @@
 package com.park.car.controller;
 
-import com.park.car.model.Reg;
-import com.park.car.model.Resp;
-import com.park.car.model.Space;
+import com.park.car.model.RegisterModel;
+import com.park.car.model.ResponseModel;
+import com.park.car.model.SpaceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -31,19 +31,19 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/example")
     public @ResponseBody
-    ArrayList<Space> example(ModelMap modelMap){
+    ArrayList<SpaceModel> example(ModelMap modelMap){
 
         String sql = "select * from space";
         Connection connection = null;
-        ArrayList<Space> mapa = new ArrayList<Space>();
+        ArrayList<SpaceModel> mapa = new ArrayList<SpaceModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Space space = new Space(rs.getInt("id"),rs.getString("place"),rs.getString("state"),rs.getInt("floor_id"));
-                mapa.add(space);
+                SpaceModel spaceModel = new SpaceModel(rs.getInt("id"),rs.getString("place"),rs.getString("state"),rs.getInt("floor_id"));
+                mapa.add(spaceModel);
             }
             System.out.print(mapa.size());
             modelMap.addAttribute("mapa", mapa);
@@ -57,10 +57,10 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Resp reg(@RequestBody final Reg reg){
+    public ResponseModel reg(@RequestBody final RegisterModel registerModel){
         String message = new String();
-        String sql = "call addUser (null,'"+reg.getE()+"', MD5('"+reg.getP()+"'), '', '')";
-        String sqlResponse = "SELECT * FROM user WHERE email = '"+reg.getE()+"' AND sysdate() between validfrom and validto";
+        String sql = "call addUser (null,'"+ registerModel.getEmail()+"', MD5('"+ registerModel.getPassword()+"'), '', '')";
+        String sqlResponse = "SELECT * FROM user WHERE email = '"+ registerModel.getEmail()+"' AND sysdate() between validfrom and validto";
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
@@ -84,9 +84,9 @@ public class DatabaseController {
                 } catch (SQLException e) {}
             }
         }
-        Resp resp = new Resp();
-        resp.setMessage(message);
-        return resp;
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(message);
+        return responseModel;
     }
 
 }

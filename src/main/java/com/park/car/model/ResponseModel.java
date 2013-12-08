@@ -1,6 +1,6 @@
 package com.park.car.model;
 
-public class Resp {
+public class ResponseModel {
 
     private String message;
 

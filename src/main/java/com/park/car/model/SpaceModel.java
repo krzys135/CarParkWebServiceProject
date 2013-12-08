@@ -3,8 +3,8 @@ package com.park.car.model;
 /**
  * Created by Jarek on 07.12.13.
  */
-public class Space {
-    public Space(int id, String place, String state, int floor_id) {
+public class SpaceModel {
+    public SpaceModel(int id, String place, String state, int floor_id) {
         this.id = id;
         this.place = place;
         this.state = state;
