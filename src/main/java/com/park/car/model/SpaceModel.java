@@ -4,11 +4,12 @@ package com.park.car.model;
  * Created by Jarek on 07.12.13.
  */
 public class SpaceModel {
-    public SpaceModel(int id, String place, String state, int floor_id) {
+    public SpaceModel(int id, String place, String state, int floor_id, String sensor) {
         this.id = id;
         this.place = place;
         this.state = state;
         this.floor_id = floor_id;
+        this.sensor = sensor;
     }
 
     @Override
@@ -18,13 +19,23 @@ public class SpaceModel {
                 ", place='" + place + '\'' +
                 ", state='" + state + '\'' +
                 ", floor_id=" + floor_id +
+                ", sensor='" + sensor + '\'' +
                 '}';
+    }
+
+    public String getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 
     private int id;
     private String place;
     private String state;
     private int floor_id;
+    private String sensor;
 
     public int getId() {
         return id;

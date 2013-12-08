@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -27,31 +24,31 @@ public class DatabaseController {
         this.dataSource = dataSource;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/example")
-    public @ResponseBody
-    ArrayList<SpaceModel> example(ModelMap modelMap){
-
-        String sql = "select * from space";
-        Connection connection = null;
-        ArrayList<SpaceModel> mapa = new ArrayList<SpaceModel>();
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                SpaceModel spaceModel = new SpaceModel(rs.getInt("id"),rs.getString("place"),rs.getString("state"),rs.getInt("floor_id"));
-                mapa.add(spaceModel);
-            }
-            System.out.print(mapa.size());
-            modelMap.addAttribute("mapa", mapa);
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return mapa;
-        }
+//    @RequestMapping(method = RequestMethod.GET, value = "/example")
+//    public @ResponseBody
+//    ArrayList<SpaceModel> example(ModelMap modelMap){
+//
+//        String sql = "select * from space";
+//        Connection connection = null;
+//        ArrayList<SpaceModel> mapa = new ArrayList<SpaceModel>();
+//        try {
+//            connection = dataSource.getConnection();
+//            PreparedStatement ps = connection.prepareStatement(sql);
+//            ResultSet rs = ps.executeQuery();
+//
+//            while (rs.next()) {
+//                SpaceModel spaceModel = new SpaceModel(rs.getInt("id"),rs.getString("place"),rs.getString("state"),rs.getInt("floor_id"));
+//                mapa.add(spaceModel);
+//            }
+//            System.out.print(mapa.size());
+//            modelMap.addAttribute("mapa", mapa);
+//            rs.close();
+//            ps.close();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return mapa;
+//        }
 
     @RequestMapping(method = RequestMethod.POST, value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -89,9 +86,10 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/getfloor")
          @ResponseBody
-         public ArrayList<FloorModel> getFloor(){
+         public FloorModel[] getFloor(){
         String sql = "SELECT * FROM floor";
         Connection connection = null;
+        FloorModel[] floorModels;
         ArrayList<FloorModel> list = new ArrayList<FloorModel>();
         try {
             connection = dataSource.getConnection();
@@ -114,19 +112,18 @@ public class DatabaseController {
         return list;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/getspacefromfloor")
+    @RequestMapping(method = RequestMethod.GET, value = "/getsegmentfromfloor")
     @ResponseBody
-    public ArrayList<SpaceModel> getSpaceFromFloor(final FloorModel floorModel){
-        String sql = "SELECT * FROM space where state = 'FREE' AND floor_id = "+ floorModel.getId();
+    public ArrayList<SegmentModel> getSegmentFromFloor(@RequestParam(required = true) String id /*final FloorModel floorModel*/){
+        String sql = "SELECT * FROM segment where freespaces >0 AND floor_id = "+ id/*floorModel.getId()*/;
         Connection connection = null;
-        ArrayList<SpaceModel> list = new ArrayList<SpaceModel>();
+        ArrayList<SegmentModel> list = new ArrayList<SegmentModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
-                list.add(null);
-
+                list.add(new SegmentModel(resultSet.getInt(1),resultSet.getInt(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getInt(5)));
             }
             ps.close();
         } catch (SQLException e) {
@@ -141,4 +138,57 @@ public class DatabaseController {
         return list;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/getspacesfromsegment")
+    @ResponseBody
+    public ArrayList<SpaceModel> getSpacesFromSegment(@RequestParam(required = true) String id /*final SegmentModel segmentModel*/){
+        String sql = "SELECT * FROM space where state='FREE' AND sensor = '0' AND segment_id = "+ id/*segmentModel.getId()*/;
+        Connection connection = null;
+        ArrayList<SpaceModel> list = new ArrayList<SpaceModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                list.add(new SpaceModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getString(5)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {}
+            }
+        }
+        return list;
+    }
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/makereservation")
+    @ResponseBody
+    public ArrayList<SpaceModel> makeReservation(@RequestParam(required = true) String id /*final SegmentModel segmentModel*/){
+        String sql = "SELECT * FROM space where state='FREE' AND sensor = '0' AND segment_id = "+ id/*segmentModel.getId()*/;
+        Connection connection = null;
+        ArrayList<SpaceModel> list = new ArrayList<SpaceModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()){
+                list.add(new SpaceModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getString(5)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {}
+            }
+        }
+        return list;
+    }
 }
