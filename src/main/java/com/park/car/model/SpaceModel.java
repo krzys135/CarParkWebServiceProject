@@ -11,6 +11,16 @@ public class SpaceModel {
         this.floor_id = floor_id;
     }
 
+    @Override
+    public String toString() {
+        return "SpaceModel{" +
+                "id=" + id +
+                ", place='" + place + '\'' +
+                ", state='" + state + '\'' +
+                ", floor_id=" + floor_id +
+                '}';
+    }
+
     private int id;
     private String place;
     private String state;

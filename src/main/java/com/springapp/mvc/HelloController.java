@@ -2,7 +2,7 @@ package com.springapp.mvc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.park.car.model.Emial;
+import com.park.car.model.EmailModel;
 import com.park.car.model.ResponseModel;
 import com.springapp.mvc.service.ExampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,17 +61,18 @@ public class HelloController {
     }
 
     @RequestMapping(value = "/email", method = RequestMethod.GET)
-    public @ResponseBody Emial emial(){
-        Emial emial = new Emial();
-        emial.setEmial("xrysiek@wp.pl");
-        return emial;
+    public @ResponseBody
+    EmailModel emial(){
+        EmailModel emailModel = new EmailModel();
+        emailModel.setEmial("xrysiek@wp.pl");
+        return emailModel;
     }
 
     @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseModel dateTime(@RequestBody final Emial emial){
+    public ResponseModel dateTime(@RequestBody final EmailModel emailModel){
 
-        String sql = "call addUser (null,'"+emial.getEmial()+"', MD5('"+"55555"+"'), '', '')";
+        String sql = "call addUser (null,'"+ emailModel.getEmial()+"', MD5('"+"55555"+"'), '', '')";
         Connection connection = null;
         System.out.print(sql);
 
@@ -90,9 +91,6 @@ public class HelloController {
             }
         }
 
-        ResponseModel responseModel = new ResponseModel();
-        responseModel.setMessage("Witam "+ emial.getEmial() + "Data: " + emial.getDate() + "Time: " + emial.getTime());
-        //responseModel.setMessage("Poszlo");
-        return responseModel;
+               return null;
     }
 }
