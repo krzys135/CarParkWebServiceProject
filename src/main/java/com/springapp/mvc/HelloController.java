@@ -15,7 +15,9 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -64,15 +66,25 @@ public class HelloController {
     public @ResponseBody
     EmailModel emial(){
         EmailModel emailModel = new EmailModel();
-        emailModel.setEmial("xrysiek@wp.pl");
+        emailModel.setEmail("xrysiek@wp.pl");
         return emailModel;
+    }
+
+
+    @RequestMapping(value = "/array", method = RequestMethod.GET)
+    public @ResponseBody
+    List array(){
+        List <EmailModel> list = new ArrayList<>();
+        list.add(new EmailModel("dfas@oo.pl"));
+        list.add(new EmailModel("dddd@gmai.pl"));
+        return list;
     }
 
     @RequestMapping(value = "/datetime", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseModel dateTime(@RequestBody final EmailModel emailModel){
 
-        String sql = "call addUser (null,'"+ emailModel.getEmial()+"', MD5('"+"55555"+"'), '', '')";
+        String sql = "call addUser (null,'"+ emailModel.getEmail()+"', MD5('"+"55555"+"'), '', '')";
         Connection connection = null;
         System.out.print(sql);
 

@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/jdbc")
@@ -50,6 +51,36 @@ public class DatabaseController {
 //        return mapa;
 //        }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/userexist", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseModel emial(@RequestBody final EmailModel emailModel){
+        String message = new String();
+        String sqlResponse = "SELECT * FROM user WHERE email = '"+ emailModel.getEmail()+"' AND sysdate() between validfrom and validto";
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement psR = connection.prepareStatement(sqlResponse);
+            ResultSet resultSet = psR.executeQuery();
+            if (!resultSet.next()){
+                message = "false";
+            } else {
+                message = "true";
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {}
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(message);
+        return responseModel;
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseModel reg(@RequestBody final RegisterModel registerModel){
@@ -86,18 +117,16 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/getfloor")
          @ResponseBody
-         public FloorModel[] getFloor(){
+         public List<FloorModel> getFloor(){
         String sql = "SELECT * FROM floor";
         Connection connection = null;
-        FloorModel[] floorModels;
-        ArrayList<FloorModel> list = new ArrayList<FloorModel>();
+       List<FloorModel> list = new ArrayList<FloorModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()){
                 list.add(new FloorModel(resultSet.getInt(1),resultSet.getInt(2),resultSet.getInt(3),resultSet.getInt(4),resultSet.getInt(5)));
-
             }
             ps.close();
         } catch (SQLException e) {
@@ -114,10 +143,10 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/getsegmentfromfloor")
     @ResponseBody
-    public ArrayList<SegmentModel> getSegmentFromFloor(@RequestParam(required = true) String id /*final FloorModel floorModel*/){
+    public List<SegmentModel> getSegmentFromFloor(@RequestParam(required = true) String id /*final FloorModel floorModel*/){
         String sql = "SELECT * FROM segment where freespaces >0 AND floor_id = "+ id/*floorModel.getId()*/;
         Connection connection = null;
-        ArrayList<SegmentModel> list = new ArrayList<SegmentModel>();
+        List<SegmentModel> list = new ArrayList<SegmentModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);

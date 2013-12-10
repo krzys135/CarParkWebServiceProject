@@ -2,18 +2,22 @@ package com.park.car.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import java.sql.Date;
-import java.sql.Time;
-
 @JsonAutoDetect
 public class EmailModel {
-    private String emial;
+    private String email;
 
-    public String getEmial() {
-        return emial;
+    public EmailModel() {
     }
 
-    public void setEmial(String emial) {
-        this.emial = emial;
+    public EmailModel(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
