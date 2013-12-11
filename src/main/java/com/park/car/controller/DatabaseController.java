@@ -194,13 +194,13 @@ public class DatabaseController {
     }
 
 
-
     @RequestMapping(method = RequestMethod.GET, value = "/makereservation")
     @ResponseBody
-    public ArrayList<SpaceModel> makeReservation(@RequestParam(required = true) String id /*final SegmentModel segmentModel*/){
+    public String makeReservation(@RequestParam(required = true) String id, @RequestParam(required = true)
+    String email /*final SegmentModel segmentModel*/){
         String sql = "SELECT * FROM space where state='FREE' AND sensor = '0' AND segment_id = "+ id/*segmentModel.getId()*/;
         Connection connection = null;
-        ArrayList<SpaceModel> list = new ArrayList<SpaceModel>();
+        List<SpaceModel> list = new ArrayList<SpaceModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -218,6 +218,12 @@ public class DatabaseController {
                 } catch (SQLException e) {}
             }
         }
-        return list;
+        String place = null;
+        if(list.size() <=1){
+            place = list.get(0).getPlace();
+        }else if (list.size() >1){
+            place = list.get(0 + (int)(Math.random()*list.size())).getPlace();
+        }
+        return place;
     }
 }
