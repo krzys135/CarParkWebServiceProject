@@ -175,11 +175,12 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/makereservation")
     @ResponseBody
-    public SpaceModel makeReservation(@RequestParam(required = true) String id, @RequestParam(required = true)
+    public ResponseModel makeReservation(@RequestParam(required = true) String id, @RequestParam(required = true)
     String email /*final SegmentModel segmentModel*/) {
         String space = null;
         Integer spaceId = null;
         Integer rand = null;
+        TicketModel ticketModel = null;
         String sql = "SELECT * FROM space where state='FREE' AND sensor = '0' AND segment_id = " + id/*segmentModel.getId()*/;
 
         Connection connection = null;
@@ -212,10 +213,16 @@ public class DatabaseController {
         }
         try {
             String sqlR = "call enter('" + spaceId + "' , '" + email + "')";
+            String sqlT = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='A' and space_id="+spaceId;
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sqlR);
             ps.executeQuery();
             ps.close();
+            PreparedStatement psT = connection.prepareStatement(sqlT);
+            ResultSet resultSet = psT.executeQuery();
+            while (resultSet.next()){
+                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -226,7 +233,10 @@ public class DatabaseController {
                 }
             }
         }
-        return list.get(rand);
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setSpaceModel(list.get(rand));
+        responseModel.setTicketModel(ticketModel);
+        return responseModel;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/s")
