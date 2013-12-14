@@ -4,38 +4,19 @@ package com.park.car.model;
  * Created by Jarek on 07.12.13.
  */
 public class SpaceModel {
-    public SpaceModel(int id, String place, String state, int floor_id, String sensor) {
-        this.id = id;
-        this.place = place;
-        this.state = state;
-        this.floor_id = floor_id;
-        this.sensor = sensor;
-    }
-
-    @Override
-    public String toString() {
-        return "SpaceModel{" +
-                "id=" + id +
-                ", place='" + place + '\'' +
-                ", state='" + state + '\'' +
-                ", floor_id=" + floor_id +
-                ", sensor='" + sensor + '\'' +
-                '}';
-    }
-
-    public String getSensor() {
-        return sensor;
-    }
-
-    public void setSensor(String sensor) {
-        this.sensor = sensor;
-    }
-
     private int id;
     private String place;
     private String state;
-    private int floor_id;
+    private int segment_id;
     private String sensor;
+
+    public SpaceModel(int id, String place, String state, int segment_id, String sensor) {
+        this.id = id;
+        this.place = place;
+        this.state = state;
+        this.segment_id = segment_id;
+        this.sensor = sensor;
+    }
 
     public int getId() {
         return id;
@@ -61,11 +42,19 @@ public class SpaceModel {
         this.state = state;
     }
 
-    public int getFloor_id() {
-        return floor_id;
+    public int getSegment_id() {
+        return segment_id;
     }
 
-    public void setFloor_id(int floor_id) {
-        this.floor_id = floor_id;
+    public void setSegment_id(int segment_id) {
+        this.segment_id = segment_id;
+    }
+
+    public String getSensor() {
+        return sensor;
+    }
+
+    public void setSensor(String sensor) {
+        this.sensor = sensor;
     }
 }
