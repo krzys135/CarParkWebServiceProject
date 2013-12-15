@@ -177,7 +177,6 @@ public class DatabaseController {
     @ResponseBody
     public ResponseModel makeReservation(@RequestParam(required = true) String id, @RequestParam(required = true)
     String email /*final SegmentModel segmentModel*/) {
-        String space = null;
         Integer spaceId = null;
         Integer rand = null;
         TicketModel ticketModel = null;
@@ -237,6 +236,13 @@ public class DatabaseController {
         responseModel.setSpaceModel(list.get(rand));
         responseModel.setTicketModel(ticketModel);
         return responseModel;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "exit")
+    @ResponseBody
+    public String exit(){
+
+        return null;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/s")
