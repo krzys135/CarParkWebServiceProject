@@ -1,18 +1,30 @@
 package com.park.car.model;
 
+import java.sql.Time;
+
 public class TicketModel {
    private int id;
    private double fee;
+   private Time duration;
    private String state;
    private int user_id;
    private int space_id;
 
-    public TicketModel(int id, double fee, String state, int user_id, int space_id) {
+    public TicketModel(int id, double fee, Time duration, String state, int user_id, int space_id) {
         this.id = id;
         this.fee = fee;
+        this.duration=duration;
         this.state = state;
         this.user_id = user_id;
         this.space_id = space_id;
+    }
+
+    public Time getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Time duration) {
+        this.duration = duration;
     }
 
     public int getId() {

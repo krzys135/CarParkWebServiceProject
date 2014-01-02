@@ -220,7 +220,7 @@ public class DatabaseController {
             PreparedStatement psT = connection.prepareStatement(sqlT);
             ResultSet resultSet = psT.executeQuery();
             while (resultSet.next()){
-                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -238,11 +238,59 @@ public class DatabaseController {
         return responseModel;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "exit")
+    @RequestMapping(method = RequestMethod.GET, value = "/exit")
     @ResponseBody
-    public String exit(){
-
-        return null;
+    public ResponseModel exit(@RequestParam(required = true) String id){
+        String sql="call outgoing("+id+");";
+        String result = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        return responseModel;
+    }
+    @RequestMapping(method = RequestMethod.GET, value = "/setsensor/{spaceId}/{sensor}")
+    @ResponseBody
+    public String sensor(@PathVariable String spaceId, @PathVariable String sensor){
+        String sql="";
+        String result = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return "Wynik: " +spaceId+ "  ::  " +sensor;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/s")
