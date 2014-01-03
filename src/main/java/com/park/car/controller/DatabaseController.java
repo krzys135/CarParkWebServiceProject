@@ -8,11 +8,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Controller
@@ -266,6 +265,7 @@ public class DatabaseController {
         responseModel.setMessage(result);
         return responseModel;
     }
+
     @RequestMapping(method = RequestMethod.GET, value = "/setsensor/{spaceId}/{sensor}")
     @ResponseBody
     public String sensor(@PathVariable String spaceId, @PathVariable String sensor){
@@ -291,6 +291,78 @@ public class DatabaseController {
             }
         }
         return "Wynik: " +spaceId+ "  ::  " +sensor;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/new")
+    @ResponseBody
+    public ResponseModel activeTicket(@PathVariable String email){
+        String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='A'";
+        String result = null;
+        Integer segmentId, floorId;
+        Calendar enter = new GregorianCalendar();
+        Timestamp timestamp;
+        TicketModel ticketModel = null;
+        BillsModel billsModel = new BillsModel();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+
+                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+                result = "true";
+
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id();
+                PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
+                ResultSet resultSetEnter = psEnter.executeQuery();
+                if (resultSetEnter.next()){
+                    timestamp = resultSetEnter.getTimestamp(1);
+                    enter.setTimeInMillis(timestamp.getTime());
+                    billsModel.setEnterDateTime(enter);
+                }
+
+                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+
+                ps = connection.prepareStatement(sqlSpace);
+                resultSet = ps.executeQuery();
+                if(resultSet.next()){
+                    segmentId = resultSet.getInt(2);
+                    billsModel.setPlace(resultSet.getInt(1));
+                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    ps = connection.prepareStatement(sqlSegment);
+                    resultSet = ps.executeQuery();
+                    if(resultSet.next()){
+                        floorId = resultSet.getInt(2);
+                        billsModel.setSeg(resultSet.getString(1));
+                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        ps = connection.prepareStatement(sqlFloor);
+                        resultSet = ps.executeQuery();
+                        if(resultSet.next()){
+                            billsModel.setFloornumer(resultSet.getInt(1));
+                        }
+                    }
+                }
+
+            } else {
+                result = "false";
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        responseModel.setTicketModel(ticketModel);
+        responseModel.setBillsModel(billsModel);
+        return responseModel;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/s")
