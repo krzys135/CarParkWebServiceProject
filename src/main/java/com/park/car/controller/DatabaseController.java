@@ -40,7 +40,8 @@ public class DatabaseController {
             } else {
                 message = "true";
             }
-
+            resultSet.close();
+            psR.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -75,7 +76,9 @@ public class DatabaseController {
             } else {
                 message = "Taki użytkonik istnieje";
             }
-
+            ps.close();
+            resultSet.close();
+            psR.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -104,6 +107,7 @@ public class DatabaseController {
             while (resultSet.next()) {
                 list.add(new FloorModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5)));
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -131,6 +135,7 @@ public class DatabaseController {
             while (resultSet.next()) {
                 list.add(new SegmentModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getInt(5)));
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -158,6 +163,7 @@ public class DatabaseController {
             while (resultSet.next()) {
                 list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -179,6 +185,10 @@ public class DatabaseController {
         Integer spaceId = null;
         Integer rand = null;
         TicketModel ticketModel = null;
+        Integer segmentId, floorId;
+        Calendar enter = new GregorianCalendar();
+        BillsModel billsModel = new BillsModel();
+        Timestamp timestamp;
         String sql = "SELECT * FROM space where state='FREE' AND sensor = '0' AND segment_id = " + id/*segmentModel.getId()*/;
 
         Connection connection = null;
@@ -190,6 +200,7 @@ public class DatabaseController {
             while (resultSet.next()) {
                 list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -220,7 +231,42 @@ public class DatabaseController {
             ResultSet resultSet = psT.executeQuery();
             while (resultSet.next()){
                 ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id();
+                PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
+                ResultSet resultSetEnter = psEnter.executeQuery();
+                if (resultSetEnter.next()){
+                    timestamp = resultSetEnter.getTimestamp(1);
+                    enter.setTimeInMillis(timestamp.getTime());
+                    billsModel.setEnterDateTime(enter);
+                }
+                resultSetEnter.close();
+                psEnter.close();
+
+                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+
+                ps = connection.prepareStatement(sqlSpace);
+                resultSet = ps.executeQuery();
+                if(resultSet.next()){
+                    segmentId = resultSet.getInt(2);
+                    billsModel.setPlace(resultSet.getInt(1));
+                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    ps = connection.prepareStatement(sqlSegment);
+                    resultSet = ps.executeQuery();
+                    if(resultSet.next()){
+                        floorId = resultSet.getInt(2);
+                        billsModel.setSeg(resultSet.getString(1));
+                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        ps = connection.prepareStatement(sqlFloor);
+                        resultSet = ps.executeQuery();
+                        if(resultSet.next()){
+                            billsModel.setFloornumer(resultSet.getInt(1));
+                        }
+                    }
+                }
             }
+            resultSet.close();
+            psT.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -234,6 +280,7 @@ public class DatabaseController {
         ResponseModel responseModel = new ResponseModel();
         responseModel.setSpaceModel(list.get(rand));
         responseModel.setTicketModel(ticketModel);
+        responseModel.setBillsModel(billsModel);
         return responseModel;
     }
 
@@ -250,6 +297,7 @@ public class DatabaseController {
             while (resultSet.next()) {
                 result = resultSet.getString(1);
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -293,7 +341,7 @@ public class DatabaseController {
         return "Wynik: " +spaceId+ "  ::  " +sensor;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/new")
+    @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/active")
     @ResponseBody
     public ResponseModel activeTicket(@PathVariable String email){
         String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='A'";
@@ -321,9 +369,10 @@ public class DatabaseController {
                     enter.setTimeInMillis(timestamp.getTime());
                     billsModel.setEnterDateTime(enter);
                 }
+                resultSetEnter.close();
+                psEnter.close();
 
                 String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
-
                 ps = connection.prepareStatement(sqlSpace);
                 resultSet = ps.executeQuery();
                 if(resultSet.next()){
@@ -343,10 +392,10 @@ public class DatabaseController {
                         }
                     }
                 }
-
             } else {
                 result = "false";
             }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -362,6 +411,85 @@ public class DatabaseController {
         responseModel.setMessage(result);
         responseModel.setTicketModel(ticketModel);
         responseModel.setBillsModel(billsModel);
+        return responseModel;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
+    @ResponseBody
+    public ResponseModel archiveTickets(@PathVariable String email){
+        String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='E'";
+        Integer segmentId, floorId;
+        Calendar enter = new GregorianCalendar();
+        Calendar exit = new GregorianCalendar();
+        Timestamp timestampEnter, timestampExit;
+        TicketModel ticketModel = null;
+        ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id();
+                PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
+                ResultSet resultSetEnter = psEnter.executeQuery();
+                if (resultSetEnter.next()){
+                    timestampEnter = resultSetEnter.getTimestamp(1);
+                    enter.setTimeInMillis(timestampEnter.getTime());
+                    archiveBillsModel.setEnterDateTime(enter);
+                }
+                resultSetEnter.close();
+                psEnter.close();
+
+                String sqlExit = "select date from spacelog where prevstate='RESERVED' and newstate='FREE' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id();
+                PreparedStatement psExit = connection.prepareStatement(sqlExit);
+                ResultSet resultSetExit = psExit.executeQuery();
+                if (resultSetExit.next()){
+                    timestampExit = resultSetExit.getTimestamp(1);
+                    exit.setTimeInMillis(timestampExit.getTime());
+                    archiveBillsModel.setExitDateTime(exit);
+                }
+                resultSetExit.close();
+                psExit.close();
+
+                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+                ps = connection.prepareStatement(sqlSpace);
+                resultSet = ps.executeQuery();
+                if(resultSet.next()){
+                    segmentId = resultSet.getInt(2);
+                    archiveBillsModel.setPlace(resultSet.getInt(1));
+                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    ps = connection.prepareStatement(sqlSegment);
+                    resultSet = ps.executeQuery();
+                    if(resultSet.next()){
+                        floorId = resultSet.getInt(2);
+                        archiveBillsModel.setSeg(resultSet.getString(1));
+                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        ps = connection.prepareStatement(sqlFloor);
+                        resultSet = ps.executeQuery();
+                        if(resultSet.next()){
+                            archiveBillsModel.setFloornumer(resultSet.getInt(1));
+                        }
+                    }
+                }
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setTicketModel(ticketModel);
+        responseModel.setArchiveBillsModel(archiveBillsModel);
         return responseModel;
     }
 

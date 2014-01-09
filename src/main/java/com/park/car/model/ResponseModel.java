@@ -6,6 +6,15 @@ public class ResponseModel {
     private SpaceModel spaceModel;
     private TicketModel ticketModel;
     private BillsModel billsModel;
+    private ArchiveBillsModel archiveBillsModel;
+
+    public ArchiveBillsModel getArchiveBillsModel() {
+        return archiveBillsModel;
+    }
+
+    public void setArchiveBillsModel(ArchiveBillsModel archiveBillsModel) {
+        this.archiveBillsModel = archiveBillsModel;
+    }
 
     public BillsModel getBillsModel() {
         return billsModel;
