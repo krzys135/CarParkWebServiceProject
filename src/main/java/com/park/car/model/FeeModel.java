@@ -99,4 +99,26 @@ public class FeeModel {
     public void setValidto(Timestamp validto) {
         this.validto = validto;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FeeModel feeModel = (FeeModel) o;
+
+        if (charge != feeModel.charge) return false;
+        if (duration != feeModel.duration) return false;
+        if (id != feeModel.id) return false;
+        if (maxdur != feeModel.maxdur) return false;
+        if (maxsum != feeModel.maxsum) return false;
+        if (order != feeModel.order) return false;
+        if (place_id != feeModel.place_id) return false;
+        if (segment != feeModel.segment) return false;
+        if (validfrom != null ? !validfrom.equals(feeModel.validfrom) : feeModel.validfrom != null) return false;
+        if (validto != null ? !validto.equals(feeModel.validto) : feeModel.validto != null) return false;
+
+        return true;
+    }
+
 }

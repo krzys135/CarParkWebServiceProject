@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/jdbc")
@@ -418,50 +415,67 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/calculatefee/{ticketId}/")
     @ResponseBody
-    public int calculateFee(@PathVariable String ticketId) {
-        String sql = "select duration from ticket where id =" + ticketId;
+    public double calculateFee(@PathVariable String ticketId) {
+        Map<Integer, FeeModel> fm = new HashMap<>();
+        String sql = "select time_to_sec(duration) from ticket where id =" + ticketId;
+        double fee=0;
         int result = 0;
-        Calendar c = new GregorianCalendar();
-        Time time = null;
+        long seconds = 0;
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
-                time = resultSet.getTime(1);
-//                c.setTimeInMillis(time.);
-                time.setTime(time.getTime() + (long) 3600000);
-                result = (int) time.getTime() / 60000;
-                if ((time.getTime() - result * 60000) > 30000) {
-                    result++;
-                }
-
+                seconds = resultSet.getLong(1);
+                result = (int) seconds / 60;
+                result++;
+//                if ((seconds - result * 60) > 30) {
+//                    result++;
+//                }
             }
 
-            String sqlSpace = "SELECT * FROM fee where ((select sysdate() from dual) between validform  and ifnull(validto,sysdate()+1))";
-//                ps = connection.prepareStatement(sqlSpace);
-//                resultSet = ps.executeQuery();
-//                if(resultSet.next()){
-//                    segmentId = resultSet.getInt(2);
-//                    billsModel.setPlace(resultSet.getInt(1));
-//                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
-//                    ps = connection.prepareStatement(sqlSegment);
-//                    resultSet = ps.executeQuery();
-//                    if(resultSet.next()){
-//                        floorId = resultSet.getInt(2);
-//                        billsModel.setSeg(resultSet.getString(1));
-//                        String sqlFloor = "select floornumer from floor where id="+floorId;
-//                        ps = connection.prepareStatement(sqlFloor);
-//                        resultSet = ps.executeQuery();
-//                        if(resultSet.next()){
-//                            billsModel.setFloornumer(resultSet.getInt(1));
-//                        }
-//                    }
-//                }
-
+            String sqlF = "SELECT * FROM fee where ((select sysdate() from dual) between validform  and ifnull(validto,sysdate()+1)) order by `order`";
+            ps = connection.prepareStatement(sqlF);
+            resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                if (result > resultSet.getInt(5)) {
+                    fm.put(resultSet.getInt(2), new FeeModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7), resultSet.getTimestamp(8), resultSet.getTimestamp(9), resultSet.getInt(10)));
+                }
+                else break;
+            }
+            if (result <= resultSet.getInt(5)) {
+                fm.put(resultSet.getInt(2), new FeeModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7), resultSet.getTimestamp(8), resultSet.getTimestamp(9), resultSet.getInt(10)));
+            }
             resultSet.close();
             ps.close();
+            int k0=0;
+
+            if(fm.containsKey(999)) {
+                fee=fm.get(999).getCharge();
+            } else {
+                for(Map.Entry<Integer,FeeModel> f:fm.entrySet()){
+                    FeeModel fml = f.getValue();
+                    if(f.getKey()>k0){
+                        k0=f.getKey();
+                        if(!fm.get(fm.size()).equals(f.getValue())){
+                            int count = fml.getMaxdur()/fml.getDuration();
+                            result -= fml.getDuration()*count;
+                            fee+=fml.getCharge()*count;
+                        } else {
+                            double count = Math.ceil((double)result/(double)fml.getSegment());
+                            int segInDur = fml.getDuration()/fml.getSegment();
+                            System.out.println(Math.ceil(count));
+                            result -= fml.getSegment()*count;
+                            fee+=count*(fml.getCharge()/segInDur);
+                        }
+                    }
+                }
+            }
+
+
+            //update fee in ticket
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -473,7 +487,7 @@ public class DatabaseController {
             }
         }
 
-        return result;
+        return fee;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
