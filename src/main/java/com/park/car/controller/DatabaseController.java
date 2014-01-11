@@ -222,20 +222,20 @@ public class DatabaseController {
         }
         try {
             String sqlR = "call enter('" + spaceId + "' , '" + email + "')";
-            String sqlT = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='A' and space_id="+spaceId;
+            String sqlT = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='A' and space_id=" + spaceId;
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sqlR);
             ps.executeQuery();
             ps.close();
             PreparedStatement psT = connection.prepareStatement(sqlT);
             ResultSet resultSet = psT.executeQuery();
-            while (resultSet.next()){
-                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+            while (resultSet.next()) {
+                ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
 
-                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id()+" and ticket_id="+ticketModel.getId();
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
-                if (resultSetEnter.next()){
+                if (resultSetEnter.next()) {
                     timestamp = resultSetEnter.getTimestamp(1);
                     enter.setTimeInMillis(timestamp.getTime());
                     billsModel.setEnterDateTime(enter);
@@ -243,23 +243,23 @@ public class DatabaseController {
                 resultSetEnter.close();
                 psEnter.close();
 
-                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+                String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
 
                 ps = connection.prepareStatement(sqlSpace);
                 resultSet = ps.executeQuery();
-                if(resultSet.next()){
+                if (resultSet.next()) {
                     segmentId = resultSet.getInt(2);
                     billsModel.setPlace(resultSet.getInt(1));
-                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
                     ps = connection.prepareStatement(sqlSegment);
                     resultSet = ps.executeQuery();
-                    if(resultSet.next()){
+                    if (resultSet.next()) {
                         floorId = resultSet.getInt(2);
                         billsModel.setSeg(resultSet.getString(1));
-                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        String sqlFloor = "select floornumer from floor where id=" + floorId;
                         ps = connection.prepareStatement(sqlFloor);
                         resultSet = ps.executeQuery();
-                        if(resultSet.next()){
+                        if (resultSet.next()) {
                             billsModel.setFloornumer(resultSet.getInt(1));
                         }
                     }
@@ -286,8 +286,8 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/exit")
     @ResponseBody
-    public ResponseModel exit(@RequestParam(required = true) String id){
-        String sql="call outgoing("+id+");";
+    public ResponseModel exit(@RequestParam(required = true) String id) {
+        String sql = "call outgoing(" + id + ");";
         String result = null;
         Connection connection = null;
         try {
@@ -316,8 +316,8 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/setsensor/id/{spaceId}/state/{sensor}")
     @ResponseBody
-    public String sensor(@PathVariable String spaceId, @PathVariable String sensor){
-        String sql="call setsensor("+spaceId+","+sensor+")";
+    public String sensor(@PathVariable String spaceId, @PathVariable String sensor) {
+        String sql = "call setsensor(" + spaceId + "," + sensor + ")";
         String result = null;
         Connection connection = null;
         try {
@@ -338,13 +338,13 @@ public class DatabaseController {
                 }
             }
         }
-        return "Wynik: " +spaceId+ "  ::  " +sensor;
+        return "Wynik: " + spaceId + "  ::  " + sensor;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/active")
     @ResponseBody
-    public ResponseModel activeTicket(@PathVariable String email){
-        String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='A'";
+    public ResponseModel activeTicket(@PathVariable String email) {
+        String sql = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='A'";
         String result = null;
         Integer segmentId, floorId;
         Calendar enter = new GregorianCalendar();
@@ -358,14 +358,14 @@ public class DatabaseController {
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
 
-                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+                ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
                 result = "true";
 
-                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id()+" and ticket_id="+ticketModel.getId();
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
                 System.out.println(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
-                if (resultSetEnter.next()){
+                if (resultSetEnter.next()) {
                     timestamp = resultSetEnter.getTimestamp(1);
                     enter.setTimeInMillis(timestamp.getTime());
                     billsModel.setEnterDateTime(enter);
@@ -373,22 +373,22 @@ public class DatabaseController {
                 resultSetEnter.close();
                 psEnter.close();
 
-                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+                String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
                 ps = connection.prepareStatement(sqlSpace);
                 resultSet = ps.executeQuery();
-                if(resultSet.next()){
+                if (resultSet.next()) {
                     segmentId = resultSet.getInt(2);
                     billsModel.setPlace(resultSet.getInt(1));
-                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
                     ps = connection.prepareStatement(sqlSegment);
                     resultSet = ps.executeQuery();
-                    if(resultSet.next()){
+                    if (resultSet.next()) {
                         floorId = resultSet.getInt(2);
                         billsModel.setSeg(resultSet.getString(1));
-                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        String sqlFloor = "select floornumer from floor where id=" + floorId;
                         ps = connection.prepareStatement(sqlFloor);
                         resultSet = ps.executeQuery();
-                        if(resultSet.next()){
+                        if (resultSet.next()) {
                             billsModel.setFloornumer(resultSet.getInt(1));
                         }
                     }
@@ -416,15 +416,13 @@ public class DatabaseController {
     }
 
 
-
-
     @RequestMapping(method = RequestMethod.GET, value = "/calculatefee/{ticketId}/")
     @ResponseBody
-    public int calculateFee(@PathVariable String ticketId){
-        String sql = "select duration from ticket where id ="+ ticketId;
+    public int calculateFee(@PathVariable String ticketId) {
+        String sql = "select duration from ticket where id =" + ticketId;
         int result = 0;
         Calendar c = new GregorianCalendar();
-        Time time=null;
+        Time time = null;
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
@@ -433,15 +431,15 @@ public class DatabaseController {
             if (resultSet.next()) {
                 time = resultSet.getTime(1);
 //                c.setTimeInMillis(time.);
-                    time.setTime(time.getTime()+(long)3600000);
-                    result = (int)time.getTime()/60000;
-                if((time.getTime()-result*60000)>30000) {
+                time.setTime(time.getTime() + (long) 3600000);
+                result = (int) time.getTime() / 60000;
+                if ((time.getTime() - result * 60000) > 30000) {
                     result++;
                 }
 
-                }
+            }
 
-                String sqlSpace = "SELECT * FROM fee where ((select sysdate() from dual) between validform  and ifnull(validto,sysdate()+1))";
+            String sqlSpace = "SELECT * FROM fee where ((select sysdate() from dual) between validform  and ifnull(validto,sysdate()+1))";
 //                ps = connection.prepareStatement(sqlSpace);
 //                resultSet = ps.executeQuery();
 //                if(resultSet.next()){
@@ -480,29 +478,29 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
     @ResponseBody
-    public ResponseModel archiveTickets(@PathVariable String email){
-        String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='E'";
+    public ResponseModel archiveTickets(@PathVariable String email) {
+        String sql = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='E'";
         List<ArchiveBillsModel> archiveBillsModelsList = new ArrayList<>();
         Connection connection = null;
-        String message="false";
+        String message = "false";
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()){
-                message="true";
+            while (resultSet.next()) {
+                message = "true";
                 Integer segmentId, floorId;
                 Calendar enter = new GregorianCalendar();
                 Calendar exit = new GregorianCalendar();
                 Timestamp timestampEnter, timestampExit;
 
                 ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
-                TicketModel ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
                 archiveBillsModel.setTicketModel(ticketModel);
-                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id()+" and ticket_id="+ticketModel.getId();
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
-                if (resultSetEnter.next()){
+                if (resultSetEnter.next()) {
                     timestampEnter = resultSetEnter.getTimestamp(1);
                     enter.setTimeInMillis(timestampEnter.getTime());
                     archiveBillsModel.setEnterDateTime(enter);
@@ -510,10 +508,10 @@ public class DatabaseController {
                 resultSetEnter.close();
                 psEnter.close();
 
-                String sqlExit = "select date from spacelog where prevstate='RESERVED' and newstate='FREE' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id()+" and ticket_id="+ticketModel.getId();
+                String sqlExit = "select date from spacelog where prevstate='RESERVED' and newstate='FREE' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psExit = connection.prepareStatement(sqlExit);
                 ResultSet resultSetExit = psExit.executeQuery();
-                if (resultSetExit.next()){
+                if (resultSetExit.next()) {
                     timestampExit = resultSetExit.getTimestamp(1);
                     exit.setTimeInMillis(timestampExit.getTime());
                     archiveBillsModel.setExitDateTime(exit);
@@ -521,22 +519,22 @@ public class DatabaseController {
                 resultSetExit.close();
                 psExit.close();
 
-                String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
+                String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
                 PreparedStatement psTicket = connection.prepareStatement(sqlSpace);
                 ResultSet resultSetTicket = psTicket.executeQuery();
-                if(resultSetTicket.next()){
+                if (resultSetTicket.next()) {
                     segmentId = resultSetTicket.getInt(2);
                     archiveBillsModel.setPlace(resultSetTicket.getInt(1));
-                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+                    String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
                     psTicket = connection.prepareStatement(sqlSegment);
                     resultSetTicket = psTicket.executeQuery();
-                    if(resultSetTicket.next()){
+                    if (resultSetTicket.next()) {
                         floorId = resultSetTicket.getInt(2);
                         archiveBillsModel.setSeg(resultSetTicket.getString(1));
-                        String sqlFloor = "select floornumer from floor where id="+floorId;
+                        String sqlFloor = "select floornumer from floor where id=" + floorId;
                         psTicket = connection.prepareStatement(sqlFloor);
                         resultSetTicket = psTicket.executeQuery();
-                        if(resultSetTicket.next()){
+                        if (resultSetTicket.next()) {
                             archiveBillsModel.setFloornumer(resultSetTicket.getInt(1));
                         }
                     }
