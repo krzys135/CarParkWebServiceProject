@@ -473,8 +473,9 @@ public class DatabaseController {
                 }
             }
 
-
-            //update fee in ticket
+            String sqlT = "update ticket set fee = " + fee + " where id="+ticketId;
+            ps = connection.prepareStatement(sqlT);
+            ps.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
