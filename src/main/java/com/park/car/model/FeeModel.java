@@ -1,11 +1,13 @@
 package com.park.car.model;
 
+import java.sql.Timestamp;
+
 public class FeeModel {
     private int id, order, duration, maxdur, maxsum, charge, segment, place_id;
-    private TicketModel validfrom, validto;
+    private Timestamp validfrom, validto;
 
     public FeeModel(int id, int order, int duration, int maxdur, int maxsum, int charge, int segment,
-                    TicketModel validfrom, TicketModel validto, int place_id) {
+                    Timestamp validfrom, Timestamp validto, int place_id) {
         this.id = id;
         this.order = order;
         this.duration = duration;
@@ -82,19 +84,19 @@ public class FeeModel {
         this.place_id = place_id;
     }
 
-    public TicketModel getValidfrom() {
+    public Timestamp getValidfrom() {
         return validfrom;
     }
 
-    public void setValidfrom(TicketModel validfrom) {
+    public void setValidfrom(Timestamp validfrom) {
         this.validfrom = validfrom;
     }
 
-    public TicketModel getValidto() {
+    public Timestamp getValidto() {
         return validto;
     }
 
-    public void setValidto(TicketModel validto) {
+    public void setValidto(Timestamp validto) {
         this.validto = validto;
     }
 }
