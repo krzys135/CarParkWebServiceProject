@@ -1,19 +1,21 @@
 package com.park.car.model;
 
+import java.util.List;
+
 public class ResponseModel {
 
     private String message;
     private SpaceModel spaceModel;
     private TicketModel ticketModel;
     private BillsModel billsModel;
-    private ArchiveBillsModel archiveBillsModel;
+    private List<ArchiveBillsModel> archiveBillsModelList;
 
-    public ArchiveBillsModel getArchiveBillsModel() {
-        return archiveBillsModel;
+    public List<ArchiveBillsModel> getArchiveBillsModelList() {
+        return archiveBillsModelList;
     }
 
-    public void setArchiveBillsModel(ArchiveBillsModel archiveBillsModel) {
-        this.archiveBillsModel = archiveBillsModel;
+    public void setArchiveBillsModelList(List<ArchiveBillsModel> archiveBillsModelList) {
+        this.archiveBillsModelList = archiveBillsModelList;
     }
 
     public BillsModel getBillsModel() {

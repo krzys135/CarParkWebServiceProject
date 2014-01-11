@@ -418,20 +418,21 @@ public class DatabaseController {
     @ResponseBody
     public ResponseModel archiveTickets(@PathVariable String email){
         String sql = "select * from ticket where user_id=(select id from user where email='"+email+"') and state='E'";
-        Integer segmentId, floorId;
-        Calendar enter = new GregorianCalendar();
-        Calendar exit = new GregorianCalendar();
-        Timestamp timestampEnter, timestampExit;
-        TicketModel ticketModel = null;
-        ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
+        List<ArchiveBillsModel> archiveBillsModelsList = new ArrayList<>();
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()) {
-                ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+            while (resultSet.next()){
+                Integer segmentId, floorId;
+                Calendar enter = new GregorianCalendar();
+                Calendar exit = new GregorianCalendar();
+                Timestamp timestampEnter, timestampExit;
 
+                ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
+                TicketModel ticketModel = new TicketModel(resultSet.getInt(1),resultSet.getDouble(2),resultSet.getTime(3),resultSet.getString(4),resultSet.getInt(5),resultSet.getInt(6));
+                archiveBillsModel.setTicketModel(ticketModel);
                 String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id="+ticketModel.getSpace_id()+" and user_id="+ticketModel.getUser_id();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
@@ -455,25 +456,28 @@ public class DatabaseController {
                 psExit.close();
 
                 String sqlSpace = "SELECT place, segment_id FROM space where id="+ticketModel.getSpace_id();
-                ps = connection.prepareStatement(sqlSpace);
-                resultSet = ps.executeQuery();
-                if(resultSet.next()){
-                    segmentId = resultSet.getInt(2);
-                    archiveBillsModel.setPlace(resultSet.getInt(1));
+                PreparedStatement psTicket = connection.prepareStatement(sqlSpace);
+                ResultSet resultSetTicket = psTicket.executeQuery();
+                if(resultSetTicket.next()){
+                    segmentId = resultSetTicket.getInt(2);
+                    archiveBillsModel.setPlace(resultSetTicket.getInt(1));
                     String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
-                    ps = connection.prepareStatement(sqlSegment);
-                    resultSet = ps.executeQuery();
-                    if(resultSet.next()){
-                        floorId = resultSet.getInt(2);
-                        archiveBillsModel.setSeg(resultSet.getString(1));
+                    psTicket = connection.prepareStatement(sqlSegment);
+                    resultSetTicket = psTicket.executeQuery();
+                    if(resultSetTicket.next()){
+                        floorId = resultSetTicket.getInt(2);
+                        archiveBillsModel.setSeg(resultSetTicket.getString(1));
                         String sqlFloor = "select floornumer from floor where id="+floorId;
-                        ps = connection.prepareStatement(sqlFloor);
-                        resultSet = ps.executeQuery();
-                        if(resultSet.next()){
-                            archiveBillsModel.setFloornumer(resultSet.getInt(1));
+                        psTicket = connection.prepareStatement(sqlFloor);
+                        resultSetTicket = psTicket.executeQuery();
+                        if(resultSetTicket.next()){
+                            archiveBillsModel.setFloornumer(resultSetTicket.getInt(1));
                         }
                     }
                 }
+                resultSetTicket.close();
+                psTicket.close();
+                archiveBillsModelsList.add(archiveBillsModel);
             }
             resultSet.close();
             ps.close();
@@ -488,8 +492,7 @@ public class DatabaseController {
             }
         }
         ResponseModel responseModel = new ResponseModel();
-        responseModel.setTicketModel(ticketModel);
-        responseModel.setArchiveBillsModel(archiveBillsModel);
+        responseModel.setArchiveBillsModelList(archiveBillsModelsList);
         return responseModel;
     }
 
