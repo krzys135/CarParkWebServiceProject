@@ -8,27 +8,38 @@
 
     <context:component-scan base-package="com.springapp.mvc"/>
     <context:component-scan base-package="com.park.car"/>
-    <mvc:annotation-driven />
+    <mvc:annotation-driven/>
+
+    <import resource="database/Datasource.xml"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!--<bean name="handlerAdapter"
+    <bean name="handlerAdapter"
           class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>
                 <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
                 <ref bean="jsonConverter"/>
-
             </list>
-
         </property>
         <property name="requireSession" value="false"/>
 
-    </bean>-->
+    </bean>
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"/>
+            </list>
+        </property>
+    </bean>
+
+
     <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="supportedMediaTypes" value="application/json"/>
     </bean>
+
 </beans>
