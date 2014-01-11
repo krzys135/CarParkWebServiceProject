@@ -415,6 +415,69 @@ public class DatabaseController {
         return responseModel;
     }
 
+
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/calculatefee/{ticketId}/")
+    @ResponseBody
+    public int calculateFee(@PathVariable String ticketId){
+        String sql = "select duration from ticket where id ="+ ticketId;
+        int result = 0;
+        Calendar c = new GregorianCalendar();
+        Time time=null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                time = resultSet.getTime(1);
+//                c.setTimeInMillis(time.);
+                    time.setTime(time.getTime()+(long)3600000);
+                    result = (int)time.getTime()/60000;
+                if((time.getTime()-result*60000)>30000) {
+                    result++;
+                }
+
+                }
+
+                String sqlSpace = "SELECT * FROM fee where ((select sysdate() from dual) between validform  and ifnull(validto,sysdate()+1))";
+//                ps = connection.prepareStatement(sqlSpace);
+//                resultSet = ps.executeQuery();
+//                if(resultSet.next()){
+//                    segmentId = resultSet.getInt(2);
+//                    billsModel.setPlace(resultSet.getInt(1));
+//                    String sqlSegment = "select seg, floor_id from segment where id="+segmentId;
+//                    ps = connection.prepareStatement(sqlSegment);
+//                    resultSet = ps.executeQuery();
+//                    if(resultSet.next()){
+//                        floorId = resultSet.getInt(2);
+//                        billsModel.setSeg(resultSet.getString(1));
+//                        String sqlFloor = "select floornumer from floor where id="+floorId;
+//                        ps = connection.prepareStatement(sqlFloor);
+//                        resultSet = ps.executeQuery();
+//                        if(resultSet.next()){
+//                            billsModel.setFloornumer(resultSet.getInt(1));
+//                        }
+//                    }
+//                }
+
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+
+        return result;
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
     @ResponseBody
     public ResponseModel archiveTickets(@PathVariable String email){
