@@ -7,9 +7,9 @@
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://sql.second.vdl.pl:3306/tomkacz_carpark" />
-        <property name="username" value="tomkacz_admin" />
-        <property name="password" value="admin1234" />
+        <property name="url" value="jdbc:mysql://sql.s10.vdl.pl:3306/toka111_a" />
+        <property name="username" value="toka111_a" />
+        <property name="password" value="toka111" />
 
         <!--<property name="url" value="jdbc:mysql://localhost:3306/siproj_si"/>
         <property name="username" value="ja" />
