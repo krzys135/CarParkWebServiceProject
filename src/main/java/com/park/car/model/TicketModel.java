@@ -9,6 +9,7 @@ public class TicketModel {
    private String state;
    private int user_id;
    private int space_id;
+   private long durationSeconds;
 
     public TicketModel(int id, double fee, Time duration, String state, int user_id, int space_id) {
         this.id = id;
@@ -17,6 +18,14 @@ public class TicketModel {
         this.state = state;
         this.user_id = user_id;
         this.space_id = space_id;
+    }
+
+    public long getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(long durationSeconds) {
+        this.durationSeconds = durationSeconds;
     }
 
     public Time getDuration() {

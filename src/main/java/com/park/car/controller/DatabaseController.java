@@ -306,6 +306,7 @@ public class DatabaseController {
                 }
             }
         }
+        calculateFee(id);
         ResponseModel responseModel = new ResponseModel();
         responseModel.setMessage(result);
         return responseModel;
@@ -412,7 +413,6 @@ public class DatabaseController {
         return responseModel;
     }
 
-
     @RequestMapping(method = RequestMethod.GET, value = "/calculatefee/{ticketId}/")
     @ResponseBody
     public double calculateFee(@PathVariable String ticketId) {
@@ -448,7 +448,7 @@ public class DatabaseController {
                 fm.put(resultSet.getInt(2), new FeeModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7), resultSet.getTimestamp(8), resultSet.getTimestamp(9), resultSet.getInt(10)));
             }
             resultSet.close();
-            ps.close();
+
             int k0=0;
 
             if(fm.containsKey(999)) {
@@ -476,7 +476,7 @@ public class DatabaseController {
             String sqlT = "update ticket set fee = " + fee + " where id="+ticketId;
             ps = connection.prepareStatement(sqlT);
             ps.execute();
-
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -487,7 +487,6 @@ public class DatabaseController {
                 }
             }
         }
-
         return fee;
     }
 
@@ -511,7 +510,7 @@ public class DatabaseController {
 
                 ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
                 TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
-                archiveBillsModel.setTicketModel(ticketModel);
+
                 String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
@@ -556,6 +555,16 @@ public class DatabaseController {
                 }
                 resultSetTicket.close();
                 psTicket.close();
+
+                String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + ticketModel.getId();
+                PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
+                ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
+                if (resultSetDurationSeconds.next()){
+                    ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
+                }
+                resultSetDurationSeconds.close();
+                psDurationSeconds.close();
+                archiveBillsModel.setTicketModel(ticketModel);
                 archiveBillsModelsList.add(archiveBillsModel);
             }
             resultSet.close();
