@@ -281,6 +281,112 @@ public class DatabaseController {
         return responseModel;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/makereservationsteadily")
+    @ResponseBody
+    public ResponseModel makeReservationSteadily(@RequestParam(required = true) String email) {
+        Integer spaceId = null;
+        Integer rand;
+        TicketModel ticketModel = null;
+        Integer segmentId, floorId;
+        Calendar enter = new GregorianCalendar();
+        BillsModel billsModel = new BillsModel();
+        Timestamp timestamp;
+        Connection connection = null;
+
+        List<FloorModel> floorModelList = getFloor();
+        if (floorModelList != null) {
+            Integer max = 0;
+            Integer maxId = 0;
+            for (int i = 0; i < floorModelList.size(); i++) {
+                if (floorModelList.get(i).getFreespaces() > max) {
+                    max = floorModelList.get(i).getFreespaces();
+                    maxId = floorModelList.get(i).getId();
+                }
+            }
+            List<SegmentModel> segmentModelList = getSegmentFromFloor(maxId.toString());
+            if (segmentModelList != null) {
+                Integer maxSeg = 0;
+                Integer maxSegId = 0;
+                for (int i = 0; i < segmentModelList.size(); i++) {
+                    if (segmentModelList.get(i).getFreespaces() > maxSeg) {
+                        maxSeg = segmentModelList.get(i).getFreespaces();
+                        maxSegId = segmentModelList.get(i).getId();
+                    }
+                }
+                List<SpaceModel> spaceModelList = getSpacesFromSegment(maxSegId.toString());
+                if (spaceModelList != null) {
+                    rand = 0 + (int) (Math.random() * spaceModelList.size());
+                    if (spaceModelList.size() <= 1) {
+                        spaceId = spaceModelList.get(0).getId();
+                    } else if (spaceModelList.size() > 1) {
+                        spaceId = spaceModelList.get(rand).getId();
+                    }
+                }
+            }
+        }
+        try {
+            String sqlR = "call enter('" + spaceId + "' , '" + email + "')";
+            String sqlT = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='A' and space_id=" + spaceId;
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sqlR);
+            ps.executeQuery();
+            ps.close();
+            PreparedStatement psT = connection.prepareStatement(sqlT);
+            ResultSet resultSet = psT.executeQuery();
+            while (resultSet.next()) {
+                ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+
+                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
+                PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
+                ResultSet resultSetEnter = psEnter.executeQuery();
+                if (resultSetEnter.next()) {
+                    timestamp = resultSetEnter.getTimestamp(1);
+                    enter.setTimeInMillis(timestamp.getTime());
+                    billsModel.setEnterDateTime(enter);
+                }
+                resultSetEnter.close();
+                psEnter.close();
+
+                String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
+
+                ps = connection.prepareStatement(sqlSpace);
+                resultSet = ps.executeQuery();
+                if (resultSet.next()) {
+                    segmentId = resultSet.getInt(2);
+                    billsModel.setPlace(resultSet.getInt(1));
+                    String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
+                    ps = connection.prepareStatement(sqlSegment);
+                    resultSet = ps.executeQuery();
+                    if (resultSet.next()) {
+                        floorId = resultSet.getInt(2);
+                        billsModel.setSeg(resultSet.getString(1));
+                        String sqlFloor = "select floornumer from floor where id=" + floorId;
+                        ps = connection.prepareStatement(sqlFloor);
+                        resultSet = ps.executeQuery();
+                        if (resultSet.next()) {
+                            billsModel.setFloornumer(resultSet.getInt(1));
+                        }
+                    }
+                }
+            }
+            resultSet.close();
+            psT.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setTicketModel(ticketModel);
+        responseModel.setBillsModel(billsModel);
+        return responseModel;
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/exit")
     @ResponseBody
     public ResponseModel exit(@RequestParam(required = true) String id) {
@@ -418,7 +524,7 @@ public class DatabaseController {
     public double calculateFee(@PathVariable String ticketId) {
         Map<Integer, FeeModel> fm = new HashMap<>();
         String sql = "select time_to_sec(duration) from ticket where id =" + ticketId;
-        double fee=0;
+        double fee = 0;
         int result = 0;
         long seconds = 0;
         Connection connection = null;
@@ -441,39 +547,38 @@ public class DatabaseController {
             while (resultSet.next()) {
                 if (result > resultSet.getInt(5)) {
                     fm.put(resultSet.getInt(2), new FeeModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7), resultSet.getTimestamp(8), resultSet.getTimestamp(9), resultSet.getInt(10)));
-                }
-                else break;
+                } else break;
             }
             if (result <= resultSet.getInt(5)) {
                 fm.put(resultSet.getInt(2), new FeeModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7), resultSet.getTimestamp(8), resultSet.getTimestamp(9), resultSet.getInt(10)));
             }
             resultSet.close();
 
-            int k0=0;
+            int k0 = 0;
 
-            if(fm.containsKey(999)) {
-                fee=fm.get(999).getCharge();
+            if (fm.containsKey(999)) {
+                fee = fm.get(999).getCharge();
             } else {
-                for(Map.Entry<Integer,FeeModel> f:fm.entrySet()){
+                for (Map.Entry<Integer, FeeModel> f : fm.entrySet()) {
                     FeeModel fml = f.getValue();
-                    if(f.getKey()>k0){
-                        k0=f.getKey();
-                        if(!fm.get(fm.size()).equals(f.getValue())){
-                            int count = fml.getMaxdur()/fml.getDuration();
-                            result -= fml.getDuration()*count;
-                            fee+=fml.getCharge()*count;
+                    if (f.getKey() > k0) {
+                        k0 = f.getKey();
+                        if (!fm.get(fm.size()).equals(f.getValue())) {
+                            int count = fml.getMaxdur() / fml.getDuration();
+                            result -= fml.getDuration() * count;
+                            fee += fml.getCharge() * count;
                         } else {
-                            double count = Math.ceil((double)result/(double)fml.getSegment());
-                            int segInDur = fml.getDuration()/fml.getSegment();
+                            double count = Math.ceil((double) result / (double) fml.getSegment());
+                            int segInDur = fml.getDuration() / fml.getSegment();
                             System.out.println(Math.ceil(count));
-                            result -= fml.getSegment()*count;
-                            fee+=count*(fml.getCharge()/segInDur);
+                            result -= fml.getSegment() * count;
+                            fee += count * (fml.getCharge() / segInDur);
                         }
                     }
                 }
             }
 
-            String sqlT = "update ticket set fee = " + fee + " where id="+ticketId;
+            String sqlT = "update ticket set fee = " + fee + " where id=" + ticketId;
             ps = connection.prepareStatement(sqlT);
             ps.execute();
             ps.close();
@@ -559,7 +664,7 @@ public class DatabaseController {
                 String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + ticketModel.getId();
                 PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
                 ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
-                if (resultSetDurationSeconds.next()){
+                if (resultSetDurationSeconds.next()) {
                     ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
                 }
                 resultSetDurationSeconds.close();
