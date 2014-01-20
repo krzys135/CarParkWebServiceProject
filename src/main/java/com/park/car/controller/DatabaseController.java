@@ -467,7 +467,6 @@ public class DatabaseController {
 
                 String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
-                System.out.println(sqlEnter);
                 ResultSet resultSetEnter = psEnter.executeQuery();
                 if (resultSetEnter.next()) {
                     timestamp = resultSetEnter.getTimestamp(1);
@@ -614,7 +613,7 @@ public class DatabaseController {
                 Timestamp timestampEnter, timestampExit;
 
                 ArchiveBillsModel archiveBillsModel = new ArchiveBillsModel();
-                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
 
                 String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
                 PreparedStatement psEnter = connection.prepareStatement(sqlEnter);

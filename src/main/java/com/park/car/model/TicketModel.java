@@ -20,6 +20,14 @@ public class TicketModel {
         this.space_id = space_id;
     }
 
+    public TicketModel(int id, double fee, String state, int user_id, int space_id) {
+        this.id = id;
+        this.fee = fee;
+        this.state = state;
+        this.user_id = user_id;
+        this.space_id = space_id;
+    }
+
     public long getDurationSeconds() {
         return durationSeconds;
     }
