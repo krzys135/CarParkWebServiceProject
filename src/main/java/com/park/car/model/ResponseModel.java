@@ -4,11 +4,28 @@ import java.util.List;
 
 public class ResponseModel {
 
-    private String message;
+    private String message, message2;
     private SpaceModel spaceModel;
     private TicketModel ticketModel;
     private BillsModel billsModel;
+    private PaymentModel paymentModel;
     private List<ArchiveBillsModel> archiveBillsModelList;
+
+    public String getMessage2() {
+        return message2;
+    }
+
+    public void setMessage2(String message2) {
+        this.message2 = message2;
+    }
+
+    public PaymentModel getPaymentModel() {
+        return paymentModel;
+    }
+
+    public void setPaymentModel(PaymentModel paymentModel) {
+        this.paymentModel = paymentModel;
+    }
 
     public List<ArchiveBillsModel> getArchiveBillsModelList() {
         return archiveBillsModelList;
