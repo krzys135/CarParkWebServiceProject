@@ -413,6 +413,7 @@ public class DatabaseController {
             }
         }
         calculateFee(id);
+        createPayment(id);
         ResponseModel responseModel = new ResponseModel();
         responseModel.setMessage(result);
         return responseModel;
@@ -448,73 +449,81 @@ public class DatabaseController {
     @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/active")
     @ResponseBody
     public ResponseModel activeTicket(@PathVariable String email) {
-        String sql = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='A'";
-        String result = null;
-        Integer segmentId, floorId;
-        Calendar enter = new GregorianCalendar();
-        Timestamp timestamp;
-        TicketModel ticketModel = null;
-        BillsModel billsModel = new BillsModel();
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
+        ResponseModel model = checkDebit(email);
+        ResponseModel responseModel = new ResponseModel();
 
-                ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
-                result = "true";
-
-                String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
-                PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
-                ResultSet resultSetEnter = psEnter.executeQuery();
-                if (resultSetEnter.next()) {
-                    timestamp = resultSetEnter.getTimestamp(1);
-                    enter.setTimeInMillis(timestamp.getTime());
-                    billsModel.setEnterDateTime(enter);
-                }
-                resultSetEnter.close();
-                psEnter.close();
-
-                String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
-                ps = connection.prepareStatement(sqlSpace);
-                resultSet = ps.executeQuery();
+        if (model.getMessage().equals("debit")) {
+            responseModel.setMessage2("debit");
+            responseModel.setPaymentModel(model.getPaymentModel());
+        } else if (model.getMessage().equals("null_debit")) {
+            responseModel.setMessage2("null_debit");
+            String sql = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='A'";
+            String result = null;
+            Integer segmentId, floorId;
+            Calendar enter = new GregorianCalendar();
+            Timestamp timestamp;
+            TicketModel ticketModel = null;
+            BillsModel billsModel = new BillsModel();
+            Connection connection = null;
+            try {
+                connection = dataSource.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+                ResultSet resultSet = ps.executeQuery();
                 if (resultSet.next()) {
-                    segmentId = resultSet.getInt(2);
-                    billsModel.setPlace(resultSet.getInt(1));
-                    String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
-                    ps = connection.prepareStatement(sqlSegment);
+
+                    ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getTime(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+                    result = "true";
+
+                    String sqlEnter = "select date from spacelog where prevstate='FREE' and newstate='RESERVED' and space_id=" + ticketModel.getSpace_id() + " and user_id=" + ticketModel.getUser_id() + " and ticket_id=" + ticketModel.getId();
+                    PreparedStatement psEnter = connection.prepareStatement(sqlEnter);
+                    ResultSet resultSetEnter = psEnter.executeQuery();
+                    if (resultSetEnter.next()) {
+                        timestamp = resultSetEnter.getTimestamp(1);
+                        enter.setTimeInMillis(timestamp.getTime());
+                        billsModel.setEnterDateTime(enter);
+                    }
+                    resultSetEnter.close();
+                    psEnter.close();
+
+                    String sqlSpace = "SELECT place, segment_id FROM space where id=" + ticketModel.getSpace_id();
+                    ps = connection.prepareStatement(sqlSpace);
                     resultSet = ps.executeQuery();
                     if (resultSet.next()) {
-                        floorId = resultSet.getInt(2);
-                        billsModel.setSeg(resultSet.getString(1));
-                        String sqlFloor = "select floornumer from floor where id=" + floorId;
-                        ps = connection.prepareStatement(sqlFloor);
+                        segmentId = resultSet.getInt(2);
+                        billsModel.setPlace(resultSet.getInt(1));
+                        String sqlSegment = "select seg, floor_id from segment where id=" + segmentId;
+                        ps = connection.prepareStatement(sqlSegment);
                         resultSet = ps.executeQuery();
                         if (resultSet.next()) {
-                            billsModel.setFloornumer(resultSet.getInt(1));
+                            floorId = resultSet.getInt(2);
+                            billsModel.setSeg(resultSet.getString(1));
+                            String sqlFloor = "select floornumer from floor where id=" + floorId;
+                            ps = connection.prepareStatement(sqlFloor);
+                            resultSet = ps.executeQuery();
+                            if (resultSet.next()) {
+                                billsModel.setFloornumer(resultSet.getInt(1));
+                            }
                         }
                     }
+                } else {
+                    result = "false";
                 }
-            } else {
-                result = "false";
-            }
-            resultSet.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
+                resultSet.close();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                    }
                 }
             }
+            responseModel.setMessage(result);
+            responseModel.setTicketModel(ticketModel);
+            responseModel.setBillsModel(billsModel);
         }
-        ResponseModel responseModel = new ResponseModel();
-        responseModel.setMessage(result);
-        responseModel.setTicketModel(ticketModel);
-        responseModel.setBillsModel(billsModel);
         return responseModel;
     }
 
@@ -596,8 +605,8 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/addcash/id/{userid}/amount/{amount}/p")
     @ResponseBody
-    public String addCash(@PathVariable String userid, @PathVariable String amount){
-        String sql = "call addcash(" + userid + ","+ amount +");";
+    public String addCash(@PathVariable String userid, @PathVariable String amount) {
+        String sql = "call addcash(" + userid + "," + amount + ");";
         String result = null;
         Connection connection = null;
         try {
@@ -624,9 +633,46 @@ public class DatabaseController {
         return result;
     }
 
+    public String createPayment(String ticketId) {
+        String sql = "call createpayment(" + ticketId + ");";
+        String result = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return result;
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
     @ResponseBody
     public ResponseModel archiveTickets(@PathVariable String email) {
+
+        ResponseModel model = checkDebit(email);
+        ResponseModel responseModel = new ResponseModel();
+
+        if (model.getMessage().equals("debit")) {
+            responseModel.setMessage2("debit");
+            responseModel.setPaymentModel(model.getPaymentModel());
+        } else if (model.getMessage().equals("null_debit")) {
+            responseModel.setMessage2("null_debit");
+        }
+
         String sql = "select * from ticket where user_id=(select id from user where email='" + email + "') and state='E'";
         List<ArchiveBillsModel> archiveBillsModelsList = new ArrayList<>();
         Connection connection = null;
@@ -713,9 +759,89 @@ public class DatabaseController {
                 }
             }
         }
-        ResponseModel responseModel = new ResponseModel();
         responseModel.setArchiveBillsModelList(archiveBillsModelsList);
         responseModel.setMessage(message);
+        return responseModel;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/accountinfo/{email}/")
+    @ResponseBody
+    public AccountModel accountInformation(@PathVariable String email) {
+        String sql = "select amount from budget where user_id=(select id from user where email='" + email + "')";
+        AccountModel accountModel = new AccountModel();
+        List<PaymentModel> paymentModelList = new ArrayList<PaymentModel>();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                accountModel.setAmount(resultSet.getDouble(1));
+            }
+            resultSet.close();
+            ps.close();
+
+            String sqlD = "(SELECT * FROM payment where amount+paid=0 AND user_id= (select id from user where email='" + email + "')) union " +
+                    "(select * from payment where paid is null and ticket_id is null and user_id= (select id from user where email='" + email + "') ) order by date desc";
+
+            PreparedStatement psD = connection.prepareStatement(sqlD);
+            ResultSet resultSetD = psD.executeQuery();
+            while (resultSetD.next()) {
+                Calendar date = new GregorianCalendar();
+                Timestamp timestamp = resultSetD.getTimestamp(4);
+                date.setTimeInMillis(timestamp.getTime());
+                paymentModelList.add(new PaymentModel(resultSetD.getInt(1), resultSetD.getString(2), resultSetD.getString(3), date, resultSetD.getString(5), resultSetD.getString(6)));
+            }
+            accountModel.setPaymentModelList(paymentModelList);
+            resultSetD.close();
+            psD.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return accountModel;
+    }
+
+    public ResponseModel checkDebit(String email) {
+        String sql = "SELECT * FROM payment where amount+paid<0 and user_id =(select id from user where email='" + email + "')";
+        String result = null;
+        Connection connection = null;
+        PaymentModel paymentModel = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                Calendar date = new GregorianCalendar();
+                Timestamp timestamp = resultSet.getTimestamp(4);
+                date.setTimeInMillis(timestamp.getTime());
+                paymentModel = new PaymentModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), date, resultSet.getString(5), resultSet.getString(6));
+                result = "debit";
+            } else {
+                result = "null_debit";
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        responseModel.setPaymentModel(paymentModel);
         return responseModel;
     }
 
