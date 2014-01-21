@@ -594,6 +594,36 @@ public class DatabaseController {
         return fee;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/addcash/id/{userid}/amount/{amount}/p")
+    @ResponseBody
+    public String addCash(@PathVariable String userid, @PathVariable String amount){
+        String sql = "call addcash(" + userid + ","+ amount +");";
+        String result = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        return result;
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/archiveticket/{email}/archive")
     @ResponseBody
     public ResponseModel archiveTickets(@PathVariable String email) {
