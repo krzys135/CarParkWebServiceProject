@@ -1,4 +1,6 @@
 package com.springapp.mvc;
+import com.park.car.model.SpaceModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -6,12 +8,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Handles and retrieves the main requests
  */
 @Controller
 @RequestMapping("/main/ajax")
 public class AjaxController {
+
+    @Autowired
+    private DataSource dataSource;
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public String getAjaxAddPage() {
 
@@ -24,15 +41,31 @@ public class AjaxController {
      * Handles request for adding two numbers
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody Integer add(@RequestParam(value="inputNumber1", required=true) Integer inputNumber1,
-                                     @RequestParam(value="inputNumber2", required=true) Integer inputNumber2,
-                                     Model model) {
+    public @ResponseBody List add(@RequestParam(value="floor", required=true) String floor,
+                                  Model model) {
 
-        // Delegate to service to do the actual adding
-        Integer sum = inputNumber1+ inputNumber2;
+        String sql = "select * from space where segment_id in (Select id from segment where floor_id = (SELECT id FROM floor where floornumer="+floor+")) order by segment_id, place";
+        Connection connection = null;
+        List<SpaceModel> list = new ArrayList<SpaceModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return list;
 
-        // @ResponseBody will automatically convert the returned value into JSON format
-        // You must have Jackson in your classpath
-        return sum;
     }
 }
