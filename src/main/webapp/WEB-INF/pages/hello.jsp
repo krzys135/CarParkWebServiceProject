@@ -8,16 +8,9 @@
     </script>
  </head>
 <body>
-<h1>1. Test CSS</h1>
-
 <div id="msg"></div>
 
-
-    <b>Being Java Guys | Registration Form </b>
-
-
-Demo 1
-<div style="border: 1px solid #ccc; width: 250px;">
+<%--<div style="border: 1px solid #ccc; width: 250px;">
     Add Two Numbers:
 
     <input id="inputNumber1" name="inputNumber1" type="text" size="5"> +
@@ -43,12 +36,16 @@ Demo 1
         });
     }
 
-</script>
+</script>--%>
 
-<h3>Message : ${message}</h3>
-<h3>Username : ${username}</h3>
+<div id="logged">
+    <h3>Message : ${message}</h3>
+    <h3>Username : ${username}</h3>
 
-<a href="<c:url value="/j_spring_security_logout" />" >Wyloguj</a>
+    <a href="<c:url value="/j_spring_security_logout" />" >Wyloguj</a>
+</div>
+
+
 
 </body>
 </html>

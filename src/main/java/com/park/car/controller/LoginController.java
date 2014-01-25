@@ -14,7 +14,7 @@ public class LoginController {
 
         String name = principal.getName();
         model.addAttribute("username", name);
-        model.addAttribute("message", "Witaj na e parkingu");
+        model.addAttribute("message", "Witaj na e-parkingu");
         return "hello";
 
     }
