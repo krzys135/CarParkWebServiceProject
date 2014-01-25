@@ -7,11 +7,18 @@
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://sql.s10.vdl.pl:3306/toka111_a" />
-        <property name="username" value="toka111_a" />
-        <property name="password" value="toka111" />
+        <property name="url" value="jdbc:mysql://sql.s11.vdl.pl:3306/tokki20_a" />
+        <property name="username" value="tokki20_a" />
+        <property name="password" value="tokka111" />
 
-        <!--<property name="url" value="jdbc:mysql://localhost:3306/siproj_si"/>
+        <!--
+        Host:	sql.s11.vdl.pl
+        Nazwa użytkownika:	tokki20_a
+        Hasło:	tokka111
+
+
+
+        <property name="url" value="jdbc:mysql://localhost:3306/siproj_si"/>
         <property name="username" value="ja" />
         <property name="password" value="1234" />-->
 
