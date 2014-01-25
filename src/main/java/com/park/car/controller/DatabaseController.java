@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
@@ -880,7 +881,7 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/spacesStatus/floor/{floor}")
     public String printSpacesStatusFromFloor(ModelMap model,@PathVariable int floor) {
-/*
+
         Connection connection = null;
         List<SpaceModel> list = new ArrayList<SpaceModel>();
         try {
@@ -903,7 +904,9 @@ public class DatabaseController {
             }
         }
 
-        model.addAttribute("spaces", list);*/
+        model.addAttribute("spaces", list);
+        model.addAttribute("fromjs",list);
+        //sess.setAttribute("fromjs",list);
         return "spacesStatus";
     }
 }

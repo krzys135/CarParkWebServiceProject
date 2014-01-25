@@ -65,6 +65,7 @@ public class AjaxController {
                 }
             }
         }
+        //model.addAttribute("fromjs",list);
         return list;
 
     }
