@@ -1,6 +1,10 @@
-<%@ page import="com.park.car.model.SpaceModel" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="com.google.gson.JsonArray" %>
+<%@ page import="sun.org.mozilla.javascript.internal.json.JsonParser" %>
+<%@ page import="com.google.gson.JsonElement" %>
+<%@ page import="org.json.JSONArray" %>
+<%@ page import="com.park.car.model.SpaceModel" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.ArrayList" %>
 <%--
   Created by IntelliJ IDEA.
   User: Jarek
@@ -39,7 +43,7 @@
     </script>
     <script type="text/javascript">
         add();
-        myVar=setInterval(function(){add()},7000);
+        myVar=setInterval(function(){add()},3000);
 
         window.onbeforeunload = function(){
             clearTimeout(myVar);
@@ -50,59 +54,16 @@
         flo = flo[0].substr(7);
         function add() {
             jq(function() {
+
                 jq.post("/main/ajax/add",
                         {floor:  flo },
                         function(data){
-                            // data contains the result
-                            // Assign result to the sum id
-                            //var content = '<tbody class="tbl">';
 
-
-                            <%--<% for(SpaceModel c: (ArrayList<SpaceModel>) %> data <%){ %>--%>
-
-                            <%--<tr>--%>
-                            <%--<td><%=c.getId()%></td>--%>
-                            <%--<td><%=c.getPlace()%></td>--%>
-                            <%--<td>asd</td>--%>
-                            <%--<td>asdf</td>--%>
-                            <%--</tr>--%>
-                            <%--<% } %>--%>
-
-                            <%--for(var i=0;i<data.length;i++){--%>
-                            <%--content+= '<tr><td>'+data[i].segment_id;--%>
-                            <%--content+= '</td><td>'+data[i].place;--%>
-                            <%--content+= '</td><td>'+data[i].state;--%>
-                            <%--content+= '</td><td>'+data[i].sensor;--%>
-                            <%--content+= '</td></tr>';--%>
-                            <%--}--%>
-                            <%--content+='</tbody>';--%>
-
-                            <%--jq(".tbl").replaceWith(content);--%>
-                           alert("load");
-                            /*var content = '<tbody class="tbl">';*/
-
-                            <%--<%--%>
-
-                        <%--for(SpaceModel c: (ArrayList<SpaceModel>) %> data <%){ %>--%>
-
-                        <%--content +='<tr><td><%=c.getId()%>';--%>
-                        <%--content +='</td><td><%=c.getPlace()%>';--%>
-                        <%--content +='</td><td><%=c.getState()%>';--%>
-                        <%--content +='</td><td><%=c.getSegment_id()%>';--%>
-                        <%--content +='</td></tr>';--%>
-                            <%--<% } %>--%>
-                        <%--content +='</tbody>';--%>
-                            var myJsonString = JSON.stringify(data);
-                            jq(".tbl").replaceWith(myJsonString);
-                            //var xxx = session.setAttribute("fromjs", data);
-                            <%
-                            Object object=null;
-                            JSONArray arrayObj=null;
-                            JSONParser jsonParser=new JSONParser();
-                            object=jsonParser.parse(data);
-                            arrayObj=(JSONArray) object;
-                            System.out.println("Json object :: "+arrayObj);
-                            %>
+                            for(var i=0;i<data.length;i++){
+                                //alert(data[i].id+ " " +data[i].segment_id+ " " +data[i].place+ " " +data[i].state+ " " +data[i].sensor);
+                                var xxxxxx="<a href=\"onet.pl/?asd="+data[i].id+"\">kjhgj</a>";
+                                jq('#companies').dataTable().fnUpdate([data[i].id,data[i].segment_id,data[i].place,data[i].state,xxxxxx,data[i].sensor],i);
+                            }
                         });
             });
         }
@@ -110,36 +71,6 @@
     </script>
 </head>
 <body id="dt_example">
-
-
-<%--<table id="gradient-style" summary="Meeting Results" >--%>
-    <%--<thead>--%>
-    <%--<tr>--%>
-        <%--<th scope="col">Segment</th>--%>
-        <%--<th scope="col">Miejsce</th>--%>
-        <%--<th scope="col">Stan</th>--%>
-        <%--<th scope="col">Czujnik</th>--%>
-    <%--</tr>--%>
-    <%--</thead>--%>
-    <%--<tfoot>--%>
-    <%--<tr>--%>
-        <%--<td colspan="4">stopka test!!!</td>--%>
-    <%--</tr>--%>
-    <%--</tfoot>--%>
-    <%--<tbody class="tbl">--%>
-
-    <%--<c:forEach items="${spaces}" var="s">--%>
-        <%--<tr>--%>
-            <%--<td>${s.segment_id}</td>--%>
-            <%--<td>${s.place}</td>--%>
-            <%--<td>${s.state}</td>--%>
-            <%--<td>${s.sensor}</td>--%>
-        <%--</tr>--%>
-    <%--</c:forEach>--%>
-
-    <%--</tbody>--%>
-<%--</table>--%>
-
 <div id="container">
     <div id="demo_jui">
         <table id="companies" class="display">
@@ -149,44 +80,28 @@
                 <th>pl</th>
                 <th>stat</th>
                 <th>segid</th>
+                <th>asd</th>
+                <th>klik</th>
             </tr>
             </thead>
             <tbody class="tbl">
-            <%--<c:forEach items="${spaces}" var="s">--%>
-            <%--<script>alert("load")</script>--%>
-                    <%--<%--%>
-                        <%--if( request.getAttribute("fromjs") != null) {--%>
-                        <%--for(SpaceModel c: (ArrayList<SpaceModel>) request.getAttribute("fromjs")){ %>--%>
-
-                    <%--<tr>--%>
-                        <%--<td><%=c.getId()%></td>--%>
-                        <%--<td><%=c.getPlace()%></td>--%>
-                        <%--<td><%=c.getState()%></td>--%>
-                        <%--<td><%=c.getSegment_id()%></td>--%>
-                    <%--</tr>--%>
-                    <%--<% }} %>--%>
-
-
-
-
-                <%--<% for(SpaceModel c: (ArrayList<SpaceModel>) request.getAttribute("spaces")){ %>--%>
-
-                <%--<tr>--%>
-                    <%--<td><%=c.getId()%></td>--%>
-                    <%--<td><%=c.getPlace()%></td>--%>
-                    <%--<td>asd</td>--%>
-                    <%--<td>asdf</td>--%>
-                <%--</tr>--%>
-                <%--<% } %>--%>
-
-            <%--</c:forEach>--%>
+                <%  SpaceModel item =null;
+                    ArrayList<SpaceModel> l = (ArrayList)request.getAttribute("spaces");
+                    for(Iterator<SpaceModel> c = l.iterator(); c.hasNext(); ) {
+                    item = c.next();
+                    %>
+                <tr>
+                    <td>asdf</a></td>
+                    <td><%=item.getPlace()%></td>
+                    <td>asd</td>
+                    <td>asdf</td>
+                    <td>asdfge3</td>
+                    <td><a href="http://onet.com"> hello world </a></td>
+                </tr>
+                <% } %>
             </tbody>
         </table>
     </div>
 </div>
-
-
-
-
 </body>
 </html>

@@ -29,7 +29,7 @@ public class AjaxController {
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    @RequestMapping(value = "/add", method = RequestMethod.GET)
+    @RequestMapping(value = "/add1", method = RequestMethod.GET)
     public String getAjaxAddPage() {
 
 
@@ -41,7 +41,7 @@ public class AjaxController {
      * Handles request for adding two numbers
      */
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody List add(@RequestParam(value="floor", required=true) String floor,
+    public @ResponseBody  List<SpaceModel> add(@RequestParam(value="floor", required=true) String floor,
                                   Model model) {
 
         String sql = "select * from space where segment_id in (Select id from segment where floor_id = (SELECT id FROM floor where floornumer="+floor+")) order by segment_id, place";

@@ -905,7 +905,6 @@ public class DatabaseController {
         }
 
         model.addAttribute("spaces", list);
-        model.addAttribute("fromjs",list);
         //sess.setAttribute("fromjs",list);
         return "spacesStatus";
     }
