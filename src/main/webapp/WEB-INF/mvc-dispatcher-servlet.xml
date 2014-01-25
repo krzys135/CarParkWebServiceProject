@@ -18,6 +18,16 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
+    <bean id="unAuthenticatedUrlMapping"
+          class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="/login.do">loginController</prop>
+                <prop key="/index.jsp">loginController</prop>
+            </props>
+        </property>
+    </bean>
+
     <bean id="messageSource"
           class="org.springframework.context.support.ResourceBundleMessageSource">
         <property name="basenames">
