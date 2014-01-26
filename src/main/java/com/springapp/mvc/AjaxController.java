@@ -2,9 +2,11 @@ package com.springapp.mvc;
 import com.park.car.model.FloorModel;
 import com.park.car.model.SegmentModel;
 import com.park.car.model.SpaceModel;
+import com.park.car.model.SpacelogModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -128,4 +130,38 @@ public class AjaxController {
 
     }
 
+
+    @RequestMapping(value = "/getSpaceHistory", method = RequestMethod.POST)
+    public @ResponseBody  List<SpacelogModel> getSpaceHistory(@RequestParam(value="space", required=true) String space,Model model) {
+
+        String sql = "select * from spacelog where space_id = "+space+" order by date desc";
+        Connection connection = null;
+        List<SpacelogModel> list = new ArrayList<SpacelogModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                list.add(new SpacelogModel(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getTimestamp(5),resultSet.getInt(6),resultSet.getInt(7),resultSet.getInt(8)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return list;
+
+    }
+//
+//
+//    @RequestMapping(method = RequestMethod.GET, value = "/floorstatus/")
+//    public String printFloorStatus(ModelMap model) {
+//        return "floorstatus";
+//    }
 }

@@ -21,31 +21,47 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
-            $("#floors").dataTable({
+            $("#spacehist").dataTable({
                 "sPaginationType": "full_numbers",
                 "bJQueryUI": true
             });
         });
     </script>
     <script type="text/javascript">
-        getfloor();
-        myVar=setInterval(function(){getfloor()},10000);
+        function timeConverter(UNIX_timestamp){
+            var a = new Date(UNIX_timestamp);
+            var year = a.getFullYear();
+            var month = a.getMonth()+1;
+            var date = a.getDate();
+            var time = date+'-'+month+'-'+year+' '+a.toTimeString().substr(0,8);
+            return time;
+        }
+        getSpaceHistory();
+        myVar=setInterval(function(){getSpaceHistory()},10000);
 
         window.onbeforeunload = function(){
             clearTimeout(myVar);
         };
-        function getfloor() {
-            jq(function() {
-                jq.post("/main/ajax/getFloors",
-                        {},
-                        function(data){
-                        jq('#floors').dataTable().fnClearTable();
-                        for(var i=0;i<data.length;i++){
 
-                                var idclick="<a href=\"/main/spacesStatus/floor/"+data[i].id+"\">"+data[i].floornumber+"</a>";
-                                jq('#floors').dataTable().fnAddData([idclick,data[i].freespaces,data[i].allspaces-data[i].freespaces,data[i].allspaces],i);
-                        }
-                    });
+
+        var fl = window.location.href;
+        var regex = new RegExp("/place/\\d");
+        var sp=regex.exec(fl);
+        sp = sp[0].substr(7);
+
+        function getSpaceHistory() {
+            jq(function() {
+                jq.post("/main/ajax/getSpaceHistory",
+                        {space : sp},
+                        function(data){
+                            jq('#spacehist').dataTable().fnClearTable();
+                            for(var i=0;i<data.length;i++){
+
+                                var ticketclick="<a href=\"/main/userdetails/id/"+data[i].ticket_id+"\">"+data[i].user_id+"</a>";
+                                var ticketclick="<a href=\"/main/ticketdetails/id/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
+                                jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,data[i].prevsensor,data[i].newsensor,timeConverter(data[i].date),data[i].user_id,ticketclick],i);
+                            }
+                        });
             });
         }
     </script>
@@ -53,17 +69,23 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
-        <table id="floors" class="display">
+        <table id="spacehist" class="display">
             <thead>
             <tr>
-                <th>Floor</th>
-                <th>Free</th>
-                <th>Occupied</th>
-                <th>All</th>
+                <th>State</th>
+                <th>New state</th>
+                <th>Sensor</th>
+                <th>New sensor</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Ticket</th>
             </tr>
             </thead>
             <tbody class="tbl">
             <tr>
+                <td></td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
