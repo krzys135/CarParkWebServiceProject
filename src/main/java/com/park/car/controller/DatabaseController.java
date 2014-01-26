@@ -851,61 +851,34 @@ public class DatabaseController {
         return "spacesStatus";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/spacesStatus")
-    public String printSpacesStatus(ModelMap model) {
-        String sql = "SELECT * FROM space";
-        Connection connection = null;
-        List<SpaceModel> list = new ArrayList<SpaceModel>();
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()) {
-                list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
-            }
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
+//    @RequestMapping(method = RequestMethod.GET, value = "/spacesStatus")
+//    public String printSpacesStatus(ModelMap model) {
+//        String sql = "SELECT * FROM space";
+//        Connection connection = null;
+//        List<SpaceModel> list = new ArrayList<SpaceModel>();
+//        try {
+//            connection = dataSource.getConnection();
+//            PreparedStatement ps = connection.prepareStatement(sql);
+//            ResultSet resultSet = ps.executeQuery();
+//            while (resultSet.next()) {
+//                list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
+//            }
+//            ps.close();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (connection != null) {
+//                try {
+//                    connection.close();
+//                } catch (SQLException e) {
+//                }
+//            }
+//        }
+//
+//        model.addAttribute("spaces", list);
+//        return "spacesStatus";
+//    }
 
-        model.addAttribute("spaces", list);
-        return "spacesStatus";
-    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/spacesStatus/floor/{floor}")
-    public String printSpacesStatusFromFloor(ModelMap model,@PathVariable int floor) {
 
-        Connection connection = null;
-        List<SpaceModel> list = new ArrayList<SpaceModel>();
-        try {
-            connection = dataSource.getConnection();
-            String sql = "select * from space where segment_id in (Select id from segment where floor_id = (SELECT id FROM floor where floornumer="+floor+")) order by segment_id, place";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()) {
-                list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
-            }
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-
-        model.addAttribute("spaces", list);
-        //sess.setAttribute("fromjs",list);
-        return "spacesStatus";
-    }
 }

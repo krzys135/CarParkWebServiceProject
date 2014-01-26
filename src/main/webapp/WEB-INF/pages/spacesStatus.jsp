@@ -1,17 +1,3 @@
-<%@ page import="com.google.gson.JsonArray" %>
-<%@ page import="sun.org.mozilla.javascript.internal.json.JsonParser" %>
-<%@ page import="com.google.gson.JsonElement" %>
-<%@ page import="org.json.JSONArray" %>
-<%@ page import="com.park.car.model.SpaceModel" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.ArrayList" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: Jarek
-  Date: 14.12.13
-  Time: 08:54
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -76,10 +62,10 @@
                                                 found=segments[iter].seg;
                                                 var icon;
                                                 if(data[i].sensor=="0"){
-                                                    icon ="<p style=\"font-size:150%;color: green\"><b>•</b></p>";
+                                                    icon ="<p style=\"font-size:120%;color: green\"><b>•</b></p>";
                                                 }
-                                                else {icon ="<p style=\"font-size:150%;color: #ff0000\"><b>•</b></p>";}
-                                                var idclick="<a href=\"/placestatus/place?id="+data[i].id+"\">"+found+""+data[i].place+"</a>";
+                                                else {icon ="<p style=\"font-size:120%;color: #ff0000\"><b>•</b></p>";}
+                                                var idclick="<a href=\"/main/placestatus/place/"+data[i].id+"\">"+found+""+data[i].place+"</a>";
                                                 jq('#companies').dataTable().fnAddData([data[i].id,idclick,data[i].state,icon],i);
                                             }
                                         }
