@@ -25,7 +25,7 @@
     <script type="text/javascript">
         var jq = jQuery.noConflict();
     </script>
-    <title>Tytuł!</title>
+    <title>CarPark App</title>
 
     <link href="<c:url value="/resources/css/demo_page.css" />" rel="stylesheet"  />
     <link href="<c:url value="/resources/css/demo_table.css" />" rel="stylesheet"  />

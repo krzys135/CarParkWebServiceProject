@@ -1,4 +1,5 @@
 package com.springapp.mvc;
+import com.park.car.model.FloorModel;
 import com.park.car.model.SegmentModel;
 import com.park.car.model.SpaceModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,4 +100,32 @@ public class AjaxController {
         return list;
 
     }
+    @RequestMapping(value = "/getFloors", method = RequestMethod.POST)
+    public @ResponseBody  List<FloorModel> getFloors(Model model) {
+
+        String sql = "select * from floor";
+        Connection connection = null;
+        List<FloorModel> list = new ArrayList<FloorModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                list.add(new FloorModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getInt(5)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return list;
+
+    }
+
 }
