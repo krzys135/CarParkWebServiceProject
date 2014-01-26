@@ -2,9 +2,6 @@ package com.park.car.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-/**
- * Created by Jarek on 08.12.13.
- */
 @JsonAutoDetect
 public class FloorModel {
     private int id;

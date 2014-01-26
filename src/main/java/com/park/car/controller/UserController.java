@@ -89,6 +89,48 @@ public class UserController {
         return userModel;
     }
 
+    @RequestMapping(value = "/shinfo", method = RequestMethod.POST)
+    @ResponseBody
+    public UserModel shortInfo(@RequestParam(value = "email", required = true) String email) {
+        UserModel userModel = new UserModel();
+        AccountModel accountModel = new AccountModel();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            String sqlI = "select id from user where email='" + email + "' AND sysdate() between validfrom and validto";
+            PreparedStatement psI = connection.prepareStatement(sqlI);
+            ResultSet resultSetI = psI.executeQuery();
+            if (resultSetI.next()) {
+                userModel.setId(resultSetI.getInt(1));
+            }
+            resultSetI.close();
+            psI.close();
+
+            String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + email + "' AND sysdate() between validfrom and validto )";
+            PreparedStatement psA = connection.prepareStatement(sqlA);
+            ResultSet resultSetA = psA.executeQuery();
+            if (resultSetA.next()){
+                accountModel.setAmount(resultSetA.getDouble(1));
+            }
+            resultSetA.close();
+            psA.close();
+
+            userModel.setEmail(email);
+            userModel.setAccountModel(accountModel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModel;
+    }
+
     @RequestMapping(value = "/addmoney", method = RequestMethod.POST)
     @ResponseBody
     public String addCash(@RequestParam(value = "email", required = true) String email,
@@ -127,13 +169,24 @@ public class UserController {
     public List<UserModel> getAllUsers(){
         String sql = "SELECT * FROM user where sysdate() between validfrom and validto";
         Connection connection = null;
+        AccountModel accountModel = new AccountModel();
         List<UserModel> userModelList = new ArrayList<UserModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                userModelList.add(new UserModel(resultSet.getInt(1), resultSet.getString(2)));
+
+                String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + resultSet.getString(2) + "' AND sysdate() between validfrom and validto )";
+                PreparedStatement psA = connection.prepareStatement(sqlA);
+                ResultSet resultSetA = psA.executeQuery();
+                if (resultSetA.next()){
+                    accountModel.setAmount(resultSetA.getDouble(1));
+                    userModelList.add(new UserModel(resultSet.getInt(1), resultSet.getString(2), accountModel));
+                }
+                resultSetA.close();
+                psA.close();
+
             }
             resultSet.close();
             ps.close();

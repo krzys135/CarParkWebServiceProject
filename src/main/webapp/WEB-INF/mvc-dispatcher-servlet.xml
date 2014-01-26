@@ -9,6 +9,8 @@
     <context:component-scan base-package="com.springapp.mvc"/>
     <context:component-scan base-package="com.park.car"/>
     <mvc:resources mapping="/resources/**" location="/resources/mytheme/"/>
+    <mvc:resources mapping="/css/**" location="/resources/mytheme/css/"/>
+    <mvc:resources mapping="/js/**" location="/resources/mytheme/js/"/>
     <mvc:annotation-driven/>
 
     <import resource="database/Datasource.xml"/>

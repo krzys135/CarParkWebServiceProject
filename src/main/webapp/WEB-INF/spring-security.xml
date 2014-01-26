@@ -17,6 +17,7 @@
         <authentication-provider>
             <password-encoder hash="sha" />
             <user-service>
+                <user name="a" password="86f7e437faa5a7fce15d1ddcb9eaeaea377667b8" authorities="ROLE_USER"/>
                 <user name="admin" password="9a52eb33f379c4ab4006cb629d24975f424d8e39" authorities="ROLE_USER" />
             </user-service>
         </authentication-provider>

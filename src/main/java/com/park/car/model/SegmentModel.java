@@ -1,8 +1,5 @@
 package com.park.car.model;
 
-/**
- * Created by Jarek on 08.12.13.
- */
 public class SegmentModel {
     private int id;
     private int floor_id;

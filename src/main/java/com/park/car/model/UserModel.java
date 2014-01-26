@@ -16,6 +16,12 @@ public class UserModel {
         this.email = email;
     }
 
+    public UserModel(Integer id, String email, AccountModel accountModel) {
+        this.id = id;
+        this.email = email;
+        this.accountModel = accountModel;
+    }
+
     public UserModel(Integer id, String email, List<TicketModel> ticketModelList, AccountModel accountModel) {
         this.id = id;
         this.email = email;

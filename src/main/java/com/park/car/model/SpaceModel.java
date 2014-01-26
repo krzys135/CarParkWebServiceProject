@@ -1,8 +1,5 @@
 package com.park.car.model;
 
-/**
- * Created by Jarek on 07.12.13.
- */
 public class SpaceModel {
     private int id;
     private String place;
