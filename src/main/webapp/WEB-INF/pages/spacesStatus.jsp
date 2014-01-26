@@ -43,7 +43,7 @@
     </script>
     <script type="text/javascript">
         add();
-        myVar=setInterval(function(){add()},3000);
+        myVar=setInterval(function(){add()},10000);
 
         window.onbeforeunload = function(){
             clearTimeout(myVar);
@@ -58,16 +58,39 @@
                 jq.post("/main/ajax/add",
                         {floor:  flo },
                         function(data){
+                            jq.post("/main/ajax/getSegments",
+                                    { },
+                                    function(segments){
 
-                            for(var i=0;i<data.length;i++){
-                                //alert(data[i].id+ " " +data[i].segment_id+ " " +data[i].place+ " " +data[i].state+ " " +data[i].sensor);
-                                var xxxxxx="<a href=\"onet.pl/?asd="+data[i].id+"\">kjhgj</a>";
-                                jq('#companies').dataTable().fnUpdate([data[i].id,data[i].segment_id,data[i].place,data[i].state,xxxxxx,data[i].sensor],i);
-                            }
+                                    jq('#companies').dataTable().fnClearTable();
+
+
+                                    for(var i=0;i<data.length;i++){
+
+                                        //var xxxxxx="<a href=\"onet.pl/?asd="+data[i].id+"\">kjhgj</a>";
+
+                                        var found ="0";
+                                        for(var iter=0;iter<segments.length;iter++){
+                                        if(found=="0"){
+                                            if(segments[iter].id==data[i].segment_id) {
+                                                found=segments[iter].seg;
+                                                var icon;
+                                                if(data[i].sensor=="0"){
+                                                    icon ="<p style=\"font-size:150%;color: green\"><b>•</b></p>";
+                                                }
+                                                else {icon ="<p style=\"font-size:150%;color: #ff0000\"><b>•</b></p>";}
+                                                var idclick="<a href=\"placestatus/place?id="+data[i].id+"\">"+found+""+data[i].place+"</a>";
+                                                jq('#companies').dataTable().fnAddData([data[i].id,idclick,data[i].state,icon],i);
+                                            }
+                                        }
+                                        }
+                                    }
+
+                            });
                         });
+
             });
         }
-
     </script>
 </head>
 <body id="dt_example">
@@ -76,29 +99,19 @@
         <table id="companies" class="display">
             <thead>
             <tr>
-                <th>id</th>
-                <th>pl</th>
-                <th>stat</th>
-                <th>segid</th>
-                <th>asd</th>
-                <th>klik</th>
+                <th>ID</th>
+                <th>Place</th>
+                <th>State</th>
+                <th>Sensor</th>
             </tr>
             </thead>
             <tbody class="tbl">
-                <%  SpaceModel item =null;
-                    ArrayList<SpaceModel> l = (ArrayList)request.getAttribute("spaces");
-                    for(Iterator<SpaceModel> c = l.iterator(); c.hasNext(); ) {
-                    item = c.next();
-                    %>
                 <tr>
-                    <td>asdf</a></td>
-                    <td><%=item.getPlace()%></td>
-                    <td>asd</td>
-                    <td>asdf</td>
-                    <td>asdfge3</td>
-                    <td><a href="http://onet.com"> hello world </a></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
-                <% } %>
             </tbody>
         </table>
     </div>
