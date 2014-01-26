@@ -1,4 +1,5 @@
 package com.springapp.mvc;
+import com.park.car.model.SegmentModel;
 import com.park.car.model.SpaceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -66,6 +67,35 @@ public class AjaxController {
             }
         }
         //model.addAttribute("fromjs",list);
+        return list;
+
+    }
+
+
+    @RequestMapping(value = "/getSegments", method = RequestMethod.POST)
+    public @ResponseBody  List<SegmentModel> getSegments(Model model) {
+
+        String sql = "select * from segment";
+        Connection connection = null;
+        List<SegmentModel> list = new ArrayList<SegmentModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                list.add(new SegmentModel(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getInt(5)));
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
         return list;
 
     }
