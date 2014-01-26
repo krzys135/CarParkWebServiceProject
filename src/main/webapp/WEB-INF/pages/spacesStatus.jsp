@@ -79,7 +79,7 @@
                                                     icon ="<p style=\"font-size:150%;color: green\"><b>•</b></p>";
                                                 }
                                                 else {icon ="<p style=\"font-size:150%;color: #ff0000\"><b>•</b></p>";}
-                                                var idclick="<a href=\"placestatus/place?id="+data[i].id+"\">"+found+""+data[i].place+"</a>";
+                                                var idclick="<a href=\"/placestatus/place?id="+data[i].id+"\">"+found+""+data[i].place+"</a>";
                                                 jq('#companies').dataTable().fnAddData([data[i].id,idclick,data[i].state,icon],i);
                                             }
                                         }
