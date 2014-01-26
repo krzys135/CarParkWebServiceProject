@@ -6,6 +6,7 @@ import com.park.car.model.TicketModel;
 import com.park.car.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -164,19 +165,18 @@ public class UserController {
         return result;
     }
 
-    @RequestMapping(value = "/getallusers", method = RequestMethod.GET)
+    @RequestMapping(value = "/getallusers", method = RequestMethod.POST)
     @ResponseBody
     public List<UserModel> getAllUsers(){
         String sql = "SELECT * FROM user where sysdate() between validfrom and validto";
         Connection connection = null;
-        AccountModel accountModel = new AccountModel();
         List<UserModel> userModelList = new ArrayList<UserModel>();
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-
+                AccountModel accountModel = new AccountModel();
                 String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + resultSet.getString(2) + "' AND sysdate() between validfrom and validto )";
                 PreparedStatement psA = connection.prepareStatement(sqlA);
                 ResultSet resultSetA = psA.executeQuery();
@@ -186,7 +186,6 @@ public class UserController {
                 }
                 resultSetA.close();
                 psA.close();
-
             }
             resultSet.close();
             ps.close();
@@ -202,4 +201,17 @@ public class UserController {
         }
         return userModelList;
     }
+
+    @RequestMapping(value = "/table", method = RequestMethod.GET)
+    public String printUsersTable(){
+        return "users";
+    }
+
+    @RequestMapping(value = "/allinfo", method = RequestMethod.GET)
+    public String printAllUserInfo(@RequestParam(value = "email", required = true) String email, ModelMap modelMap){
+        //UserModel userModel = info(email);
+        modelMap.addAttribute("email", email);
+        return "userinfo";
+    }
+
 }
