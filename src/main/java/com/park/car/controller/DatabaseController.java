@@ -422,17 +422,18 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/setsensor/id/{spaceId}/state/{sensor}")
     @ResponseBody
-    public String sensor(@PathVariable String spaceId, @PathVariable String sensor) {
+    public ResponseModel sensor(@PathVariable String spaceId, @PathVariable String sensor) {
         String sql = "call setsensor(" + spaceId + "," + sensor + ")";
         String result = null;
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
+            ps.executeUpdate();
+            /*ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
                 result = resultSet.getString(1);
-            }
+            }*/
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -444,7 +445,9 @@ public class DatabaseController {
                 }
             }
         }
-        return "Wynik: " + spaceId + "  ::  " + sensor;
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        return responseModel;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/activeticket/{email}/active")
@@ -606,7 +609,7 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/addcash/id/{userid}/amount/{amount}/p")
     @ResponseBody
-    public String addCash(@PathVariable String userid, @PathVariable String amount) {
+    public ResponseModel addCash(@PathVariable String userid, @PathVariable String amount) {
         String sql = "call addcash(" + userid + "," + amount + ");";
         String result = null;
         Connection connection = null;
@@ -631,7 +634,7 @@ public class DatabaseController {
         }
         ResponseModel responseModel = new ResponseModel();
         responseModel.setMessage(result);
-        return result;
+        return responseModel;
     }
 
     public String createPayment(String ticketId) {
@@ -850,35 +853,4 @@ public class DatabaseController {
     public String printSamplePage(ModelMap model) {
         return "spacesStatus";
     }
-
-//    @RequestMapping(method = RequestMethod.GET, value = "/spacesStatus")
-//    public String printSpacesStatus(ModelMap model) {
-//        String sql = "SELECT * FROM space";
-//        Connection connection = null;
-//        List<SpaceModel> list = new ArrayList<SpaceModel>();
-//        try {
-//            connection = dataSource.getConnection();
-//            PreparedStatement ps = connection.prepareStatement(sql);
-//            ResultSet resultSet = ps.executeQuery();
-//            while (resultSet.next()) {
-//                list.add(new SpaceModel(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5)));
-//            }
-//            ps.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (connection != null) {
-//                try {
-//                    connection.close();
-//                } catch (SQLException e) {
-//                }
-//            }
-//        }
-//
-//        model.addAttribute("spaces", list);
-//        return "spacesStatus";
-//    }
-
-
-
 }

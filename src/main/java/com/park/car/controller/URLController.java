@@ -72,4 +72,9 @@ public class URLController {
     public String printPlaceStatus(ModelMap model,@PathVariable int pl) {
         return "spacedetails";
     }
+
+    @RequestMapping(value = "/cashsensor", method = RequestMethod.GET)
+    public String addCashAndChangeSensor(){
+        return "cashandsensor";
+    }
 }
