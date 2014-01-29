@@ -214,7 +214,7 @@ public class UserController {
         return "userinfo";
     }
 
-    @RequestMapping(value = "/infoid", method = RequestMethod.GET)
+    @RequestMapping(value = "/infoid", method = RequestMethod.POST)
     @ResponseBody
     public UserModel infoId(@RequestParam(value = "id", required = true) Integer id) {
         UserModel userModel = new UserModel();
@@ -273,7 +273,7 @@ public class UserController {
         return userModel;
     }
 
-    @RequestMapping(value = "/shinfoid", method = RequestMethod.GET)
+    @RequestMapping(value = "/shinfoid", method = RequestMethod.POST)
     @ResponseBody
     public UserModel shortInfoId(@RequestParam(value = "id", required = true) Integer id) {
         UserModel userModel = new UserModel();
