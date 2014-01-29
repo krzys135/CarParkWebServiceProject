@@ -44,18 +44,6 @@
                 }
             });
 
-            jq('#state').keypress(function (e) {
-                var s = jq('#state').val;
-                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 49)) {
-                    jq('#stateerr').html("Wprowadź tylko jedną liczbę z przedziału 0 - 1").show().fadeOut(6000);
-                    return false;
-                }
-                if (s.length == 2) {
-                    jq('#stateerr').html("Wprowadź tylko jedną liczbę z przedziału 0 - 1").show().fadeOut(6000);
-                    return false;
-                }
-            });
-
             jq('#ids').keypress(function (e) {
                 if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
                     jq('#idserr').html("Wprowadź tylko liczby").show().fadeOut(6000);
@@ -94,11 +82,10 @@
                 jq('#change').click(function () {
                     if(jq('#ids').val() != '' && jq('#state').val() != ''){
                         var id = jq('#ids').val();
-                        var s = jq('#state').val();
+                        var s = jq('#state').find(":selected").text();
                         jq.get("/jdbc/setsensor/id/" + id + "/state/" + s + "",
                                 function (data) {
                                     jq('#ids').val('');
-                                    jq('#state').val('');
                                     jq('#msg').html(data.message).show().fadeOut(6000);
                                 });
                     }else {
@@ -152,7 +139,12 @@
         </tr>
         <tr>
             <td>Stan:</td>
-            <td><input type="text" id="state" name="state" maxlength="1"/></td>
+            <td>
+                <select id="state">
+                    <option value="zero">0</option>
+                    <option value="one">1</option>
+                </select>
+            </td>
             <td>
                 <div id="stateerr"></div>
             </td>
