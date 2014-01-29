@@ -71,14 +71,19 @@
         function addCash() {
             jq(function () {
                 jq('#button').click(function () {
-                    var id = jq('#id').val();
-                    var am = jq('#ammount').val();
-                    jq.get("/jdbc/addcash/id/" + id + "/amount/" + am + "/p",
-                            function (data) {
-                                jq('#msg').html(data.message).show().fadeOut(6000);
-                            });
-                    jq('#id').val('');
-                    jq('#ammount').val('');
+                    if(jq('#id').val() != '' && jq('#ammount').val() != ''){
+                        var id = jq('#id').val();
+                        var am = jq('#ammount').val();
+                        jq.get("/jdbc/addcash/id/" + id + "/amount/" + am + "/p",
+                                function (data) {
+                                    jq('#msg').html(data.message).show().fadeOut(6000);
+                                });
+                        jq('#id').val('');
+                        jq('#ammount').val('');
+                    }else {
+                        jq('#msg').html("Uzupełnij wszytkie pola").show().fadeOut(6000);
+                    }
+
                 });
 
             });
@@ -87,14 +92,18 @@
         function chnageSensor() {
             jq(function () {
                 jq('#change').click(function () {
-                    var id = jq('#ids').val();
-                    var s = jq('#state').val();
-                    jq.get("/jdbc/setsensor/id/" + id + "/state/" + s + "",
-                            function (data) {
-                                jq('#ids').val('');
-                                jq('#state').val('');
-                                jq('#msg').html(data.message).show().fadeOut(6000);
-                            });
+                    if(jq('#ids').val() != '' && jq('#state').val() != ''){
+                        var id = jq('#ids').val();
+                        var s = jq('#state').val();
+                        jq.get("/jdbc/setsensor/id/" + id + "/state/" + s + "",
+                                function (data) {
+                                    jq('#ids').val('');
+                                    jq('#state').val('');
+                                    jq('#msg').html(data.message).show().fadeOut(6000);
+                                });
+                    }else {
+                        jq('#msg').html("Uzupełnij wszytkie pola").show().fadeOut(6000);
+                    }
                 });
 
             });

@@ -429,11 +429,15 @@ public class DatabaseController {
         try {
             connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.executeUpdate();
-            /*ResultSet resultSet = ps.executeQuery();
+            ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                result = resultSet.getString(1);
-            }*/
+                if(resultSet.getString(1).equals("STATECHANGED")){
+                    result = "Sensor został zmieniony";
+                }else if (resultSet.getString(1).equals("STATENOTCHANGED")){
+                    result = "Sensor nie został zmieniony";
+                }
+            }
+            resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -618,7 +622,15 @@ public class DatabaseController {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
-                result = resultSet.getString(1);
+                if(resultSet.getString(1).equals("NOSUCHUSER")){
+                    result = "Brak użytkownika o podanym id";
+                }else if (resultSet.getString(1).equals("OPLATA_NIEPELNA")){
+                    result = "Doładowanie nie pełne";
+                }else if (resultSet.getString(1).equals("OPLATA_PELNA")){
+                    result = "Doładowanie pełne";
+                }else if (resultSet.getString(1).equals("KONTO_DOLADOWANE")){
+                    result = "Konto doładowane";
+                }
             }
             resultSet.close();
             ps.close();
