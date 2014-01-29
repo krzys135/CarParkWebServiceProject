@@ -111,7 +111,7 @@ public class UserController {
             String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + email + "' AND sysdate() between validfrom and validto )";
             PreparedStatement psA = connection.prepareStatement(sqlA);
             ResultSet resultSetA = psA.executeQuery();
-            if (resultSetA.next()){
+            if (resultSetA.next()) {
                 accountModel.setAmount(resultSetA.getDouble(1));
             }
             resultSetA.close();
@@ -167,7 +167,7 @@ public class UserController {
 
     @RequestMapping(value = "/getallusers", method = RequestMethod.POST)
     @ResponseBody
-    public List<UserModel> getAllUsers(){
+    public List<UserModel> getAllUsers() {
         String sql = "SELECT * FROM user where sysdate() between validfrom and validto";
         Connection connection = null;
         List<UserModel> userModelList = new ArrayList<UserModel>();
@@ -180,7 +180,7 @@ public class UserController {
                 String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + resultSet.getString(2) + "' AND sysdate() between validfrom and validto )";
                 PreparedStatement psA = connection.prepareStatement(sqlA);
                 ResultSet resultSetA = psA.executeQuery();
-                if (resultSetA.next()){
+                if (resultSetA.next()) {
                     accountModel.setAmount(resultSetA.getDouble(1));
                     userModelList.add(new UserModel(resultSet.getInt(1), resultSet.getString(2), accountModel));
                 }
@@ -203,15 +203,147 @@ public class UserController {
     }
 
     @RequestMapping(value = "/table", method = RequestMethod.GET)
-    public String printUsersTable(){
+    public String printUsersTable() {
         return "users";
     }
 
     @RequestMapping(value = "/allinfo", method = RequestMethod.GET)
-    public String printAllUserInfo(@RequestParam(value = "email", required = true) String email, ModelMap modelMap){
+    public String printAllUserInfo(@RequestParam(value = "email", required = true) String email, ModelMap modelMap) {
         //UserModel userModel = info(email);
         modelMap.addAttribute("email", email);
         return "userinfo";
     }
 
+    @RequestMapping(value = "/infoid", method = RequestMethod.GET)
+    @ResponseBody
+    public UserModel infoId(@RequestParam(value = "id", required = true) Integer id) {
+        UserModel userModel = new UserModel();
+        AccountModel accountModel;
+        List<TicketModel> ticketModelList = new ArrayList<TicketModel>();
+
+        String sql = "select * from ticket where user_id=" + id + "";
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+
+                String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + ticketModel.getId();
+                PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
+                ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
+                if (resultSetDurationSeconds.next()) {
+                    ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
+                }
+
+                resultSetDurationSeconds.close();
+                psDurationSeconds.close();
+                ticketModelList.add(ticketModel);
+            }
+            resultSet.close();
+            ps.close();
+
+            String sqlE = "select email from user where id=" + id;
+            PreparedStatement psE = connection.prepareStatement(sqlE);
+            ResultSet resultSetE = psE.executeQuery();
+            if (resultSetE.next()) {
+                userModel.setEmail(resultSetE.getString(1));
+            }
+            resultSetE.close();
+            psE.close();
+
+            DatabaseController controller = new DatabaseController();
+            controller.setDataSource(dataSource);
+            accountModel = controller.accountInformation(userModel.getEmail());
+
+            userModel.setId(id);
+            userModel.setTicketModelList(ticketModelList);
+            userModel.setAccountModel(accountModel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModel;
+    }
+
+    @RequestMapping(value = "/shinfoid", method = RequestMethod.GET)
+    @ResponseBody
+    public UserModel shortInfoId(@RequestParam(value = "id", required = true) Integer id) {
+        UserModel userModel = new UserModel();
+        AccountModel accountModel = new AccountModel();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            String sqlE = "select email from user where id=" + id;
+            PreparedStatement psE = connection.prepareStatement(sqlE);
+            ResultSet resultSetE = psE.executeQuery();
+            if (resultSetE.next()) {
+                userModel.setEmail(resultSetE.getString(1));
+            }
+            resultSetE.close();
+            psE.close();
+
+            String sqlA = "select amount from budget where user_id=" + id;
+            PreparedStatement psA = connection.prepareStatement(sqlA);
+            ResultSet resultSetA = psA.executeQuery();
+            if (resultSetA.next()) {
+                accountModel.setAmount(resultSetA.getDouble(1));
+            }
+            resultSetA.close();
+            psA.close();
+
+            userModel.setId(id);
+            userModel.setAccountModel(accountModel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModel;
+    }
+
+    @RequestMapping(value = "/addmoneyid", method = RequestMethod.POST)
+    @ResponseBody
+    public String addCashId(@RequestParam(value = "id", required = true) Integer id,
+                            @RequestParam(value = "amount", required = true) String amount) {
+
+        String sql = "call addcash((" + id + ")," + amount + ");";
+        String result = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                result = resultSet.getString(1);
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setMessage(result);
+        return result;
+    }
 }
