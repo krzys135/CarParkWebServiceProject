@@ -398,4 +398,32 @@ public class AjaxController {
         return userModel;
     }
 
+
+    @RequestMapping(value = "/getShortSpaceInfo", method = RequestMethod.POST)
+    public @ResponseBody SpaceModel getShortSpaceInfo(@RequestParam(value="id", required=true) int id,Model model) {
+        SpaceModel spaceModel = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            String sql = "select space.id, concat(seg,  place ), state, segment_id, sensor from space join segment on segment.id = space.segment_id where space.id=" + id;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                spaceModel = new SpaceModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getString(5));
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return spaceModel;
+    }
 }
