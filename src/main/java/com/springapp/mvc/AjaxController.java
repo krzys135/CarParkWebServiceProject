@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -164,21 +163,57 @@ public class AjaxController {
     }
 
 
+    public List<UserModel> getAllUsers() {
+        String sql = "SELECT * FROM user where sysdate() between validfrom and validto";
+        Connection connection = null;
+        List<UserModel> userModelList = new ArrayList<UserModel>();
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                AccountModel accountModel = new AccountModel();
+                String sqlA = "select amount from budget where user_id=(SELECT id FROM user where email='" + resultSet.getString(2) + "' AND sysdate() between validfrom and validto )";
+                PreparedStatement psA = connection.prepareStatement(sqlA);
+                ResultSet resultSetA = psA.executeQuery();
+                if (resultSetA.next()) {
+                    accountModel.setAmount(resultSetA.getDouble(1));
+                    userModelList.add(new UserModel(resultSet.getInt(1), resultSet.getString(2), accountModel));
+                }
+                resultSetA.close();
+                psA.close();
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModelList;
+    }
+
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.POST)
-    public @ResponseBody UserModel getUserInfo(@RequestParam(value="id", required=false) int id,Model model) {
+    public @ResponseBody List<UserModel> getUserInfo(@RequestParam(value="id", required=false) int id,Model model) {
 
         String sql = "";
         if(id != -1){
             sql="select * from ticket where user_id=" + id + "";
         } else {
-            sql="select 'DUPA' from dual";
+            return getAllUsers();
         }
 
 
-        UserModel userModel = new UserModel();
-        AccountModel accountModel;
+        List<UserModel> userModel = new ArrayList<UserModel>();
+        AccountModel accountModel=new AccountModel();;
         List<TicketModel> ticketModelList = new ArrayList<TicketModel>();
-
+        List<PaymentModel> paymentModelList = new ArrayList<PaymentModel>();
+        userModel.add(new UserModel());
 
         Connection connection = null;
         try {
@@ -206,18 +241,34 @@ public class AjaxController {
             PreparedStatement psE = connection.prepareStatement(sqlE);
             ResultSet resultSetE = psE.executeQuery();
             if (resultSetE.next()) {
-                userModel.setEmail(resultSetE.getString(1));
+                userModel.get(0).setEmail(resultSetE.getString(1));
             }
             resultSetE.close();
             psE.close();
 
-            DatabaseController controller = new DatabaseController();
-            controller.setDataSource(dataSource);
-            accountModel = controller.accountInformation(userModel.getEmail());
+//            DatabaseController controller = new DatabaseController();
+//            controller.setDataSource(dataSource);
+//            accountModel = controller.accountInformation(userModel.get(0).getEmail());
 
-            userModel.setId(id);
-            userModel.setTicketModelList(ticketModelList);
-            userModel.setAccountModel(accountModel);
+            String sqlD = "SELECT * FROM payment where  user_id= "+ id +" order by date desc";
+
+            PreparedStatement psD = connection.prepareStatement(sqlD);
+            ResultSet resultSetD = psD.executeQuery();
+            while (resultSetD.next()) {
+                Calendar date = new GregorianCalendar();
+                Timestamp timestamp = resultSetD.getTimestamp(4);
+                date.setTimeInMillis(timestamp.getTime());
+                paymentModelList.add(new PaymentModel(resultSetD.getInt(1), resultSetD.getString(2), resultSetD.getString(3), date, resultSetD.getString(5), resultSetD.getString(6)));
+            }
+            resultSetD.close();
+            psD.close();
+            accountModel.setPaymentModelList(paymentModelList);
+
+
+
+            userModel.get(0).setId(id);
+            userModel.get(0).setTicketModelList(ticketModelList);
+            userModel.get(0).setAccountModel(accountModel);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -273,6 +324,34 @@ public class AjaxController {
             }
         }
         return userModel;
+    }
+
+    @RequestMapping(value = "/getShortSpaceInfo", method = RequestMethod.POST)
+    public @ResponseBody SpaceModel getShortSpaceInfo(@RequestParam(value="id", required=true) int id,Model model) {
+        SpaceModel spaceModel = null;
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            String sql = "select space.id, concat(seg,  place ), state, segment_id, sensor from space join segment on segment.id = space.segment_id where space.id=" + id;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                spaceModel = new SpaceModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getString(5));
+            }
+            resultSet.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return spaceModel;
     }
 //
 //

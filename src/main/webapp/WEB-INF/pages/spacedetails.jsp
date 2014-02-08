@@ -73,12 +73,26 @@
 
 
 
-                                var userclick="<a href=\"/main/userdetails/id/"+data[i].user_id+"\">"+data[i].user_id+"</a>";
+                                var userclick="<a href=\"/main/userdetails/"+data[i].user_id+"\">"+data[i].user_id+"</a>";
                                 var ticketclick="<a href=\"/main/ticketdetails/id/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
                                 var spaceclick="<a href=\"/main/placestatus/place/"+data[i].space_id+"\">"+data[i].space_id+"</a>";
                                 jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,iconpr,iconnx,timeConverter(data[i].date),userclick,ticketclick,spaceclick],i+1);
 
                             }
+                        });
+            });
+
+            jq(function () {
+                jq.post("/main/ajax/getShortSpaceInfo",
+                        {id: sp},
+                        function (data) {
+                            var sens;
+                            if(data.sensor=="0"){
+                                sens ="<span style=\"font-size:120%;color: green\"><b>•</b></span>";
+                            }
+                            else {sens ="<span style=\"font-size:120%;color: #ff0000\"><b>•</b></span>";}
+                            jq('#shortinfo').html("<h3>ID: " + data.id+" Space: "+data.place+"   State:"+data.state+" "+ sens+ "</h3>");
+
                         });
             });
         }
@@ -87,6 +101,10 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <div id = "shortinfo">
+            Loading...
+        </div>
+        <br>
         <table id="spacehist" class="display">
             <thead>
             <tr>

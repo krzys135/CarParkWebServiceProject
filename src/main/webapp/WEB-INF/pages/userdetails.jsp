@@ -35,7 +35,11 @@
         if(id!=null) {
             id = id[0].substr(12);
         }
-        else {id =-1;}
+        else {
+            id =-1;
+        }
+
+
         jQuery(document).ready(function ($) {
                 $("#paymenttab").dataTable({
                     "sPaginationType": "full_numbers",
@@ -45,6 +49,13 @@
 
         jQuery(document).ready(function ($) {
             $("#ticketstab").dataTable({
+                "sPaginationType": "full_numbers",
+                "bJQueryUI": true
+            });
+        });
+
+        jQuery(document).ready(function ($) {
+            $("#userstab").dataTable({
                 "sPaginationType": "full_numbers",
                 "bJQueryUI": true
             });
@@ -61,45 +72,47 @@
 
 
         function getUserDetails() {
-            jq(function () {
+           jq(function () {
                 jq.post("/main/ajax/getUserInfo",
                         {id: id},
                         function (data) {
-
-                        });
-            });
-
-
-            jq(function () {
-                jq.post("/main/ajax/getUserInfo",
-                        {id: id},
-                        function (data) {
-                            jq('#ticketstab').dataTable().fnClearTable();
-                            for (var i = 0; i < data.ticketModelList.length; i++) {
-
-                                var sek = data.ticketModelList[i].durationSeconds;
-                                var sec_num = parseInt(sek, 10); // don't forget the second param
-                                var hours   = Math.floor(sec_num / 3600);
-                                var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-                                var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-                                if (hours   < 10) {hours   = "0"+hours;}
-                                if (minutes < 10) {minutes = "0"+minutes;}
-                                if (seconds < 10) {seconds = "0"+seconds;}
-                                var time    = hours+':'+minutes+':'+seconds;
-                                var idclick="<a href=\"/main/placestatus/place/"+data.ticketModelList[i].space_id+"\">"+data.ticketModelList[i].space_id+"</a>";
-                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, idclick], i+1);
-
+                            if (id ==-1) {
+                                jq("#tohide").css('display', 'none');
+                            jq('#userstab').dataTable().fnClearTable();
+                            for (var i = 0; i < data.length; i++) {
+                                var emailclick = "<a href=\"/main/userdetails/" + data[i].id +"\">" + data[i].email + "</a>";
+                                jq('#userstab').dataTable().fnAddData([data[i].id, emailclick , data[i].accountModel.amount], i+1);
                             }
-
-                            jq('#paymenttab').dataTable().fnClearTable();
-                            for (var i = 0; i < data.accountModel.paymentModelList.length; i++) {
-                                var ticketclick=data.accountModel.paymentModelList[i].ticket_id;
-                                if (ticketclick!=null) {
-                                    ticketclick="<a href=\"/main/ticketdetails/id/"+data.accountModel.paymentModelList[i].ticket_id+"\">"+data.accountModel.paymentModelList[i].ticket_id+"</a>";
-                                } else {ticketclick="";}
-                                jq('#paymenttab').dataTable().fnAddData([data.accountModel.paymentModelList[i].id, data.accountModel.paymentModelList[i].amount , data.accountModel.paymentModelList[i].paid, timeConverter(data.accountModel.paymentModelList[i].date), ticketclick], i+1);
                             }
+                            else {
+                                jq(".allus").css('display', 'none');
+
+                                jq('#ticketstab').dataTable().fnClearTable();
+                                for (var i = 0; i < data[0].ticketModelList.length; i++) {
+
+                                    var sek = data[0].ticketModelList[i].durationSeconds;
+                                    var sec_num = parseInt(sek, 10); // don't forget the second param
+                                    var hours   = Math.floor(sec_num / 3600);
+                                    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+                                    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+                                    if (hours   < 10) {hours   = "0"+hours;}
+                                    if (minutes < 10) {minutes = "0"+minutes;}
+                                    if (seconds < 10) {seconds = "0"+seconds;}
+                                    var time    = hours+':'+minutes+':'+seconds;
+                                    var idclick="<a href=\"/main/placestatus/place/"+data[0].ticketModelList[i].space_id+"\">"+data[0].ticketModelList[i].space_id+"</a>";
+                                    jq('#ticketstab').dataTable().fnAddData([data[0].ticketModelList[i].id, data[0].ticketModelList[i].fee , time, data[0].ticketModelList[i].state, idclick], i+1);
+
+                                }
+
+                                jq('#paymenttab').dataTable().fnClearTable();
+                                for (var i = 0; i < data[0].accountModel.paymentModelList.length; i++) {
+                                    var ticketclick=data[0].accountModel.paymentModelList[i].ticket_id;
+                                    if (ticketclick!=null) {
+                                        ticketclick="<a href=\"/main/ticketdetails/id/"+data[0].accountModel.paymentModelList[i].ticket_id+"\">"+data[0].accountModel.paymentModelList[i].ticket_id+"</a>";
+                                    } else {ticketclick="";}
+                                    jq('#paymenttab').dataTable().fnAddData([data[0].accountModel.paymentModelList[i].id, data[0].accountModel.paymentModelList[i].amount , data[0].accountModel.paymentModelList[i].paid, timeConverter(data[0].accountModel.paymentModelList[i].date), ticketclick], i+1);
+                                }}
 
                         });
             });
@@ -116,11 +129,15 @@
 
 
         }
+
+
+
     </script>
 </head>
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <div id = "tohide">
         <div id = "shortinfo">
         Loading...
         </div>
@@ -171,6 +188,27 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+        </div>
+        <div class="allus">
+        <div id="users">
+            <table id="userstab" class="display">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Balance</th>
+                </tr>
+                </thead>
+                <tbody class="tbl">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         </div>
 </div>
 </div>
