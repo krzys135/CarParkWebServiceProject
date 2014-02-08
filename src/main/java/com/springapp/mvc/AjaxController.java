@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.sql.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 /**
  * Handles and retrieves the main requests
@@ -285,6 +289,74 @@ public class AjaxController {
 
 
 
+    @RequestMapping(value = "/getTicketInfo", method = RequestMethod.POST)
+    public @ResponseBody ResponseModel getTicketInfo(@RequestParam(value = "id", required = true) int id){
+        String sql = "SELECT * FROM ticket where id='"+id+"'";
+        Connection connection = null;
+        TicketModel ticketModel = null;
+        PaymentModel paymentModel = null;
+        try {
+            connection = dataSource.getConnection();
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+                String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + id;
+                PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
+                ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
+                if (resultSetDurationSeconds.next()) {
+                    ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
+                }
+                resultSetDurationSeconds.close();
+                psDurationSeconds.close();
+            }
+            resultSet.close();
+            ps.close();
+
+            String sqlPayment = "SELECT * FROM payment where ticket_id ="+id+"";
+            PreparedStatement psPayment = connection.prepareStatement(sqlPayment);
+            ResultSet resultSetPayment = psPayment.executeQuery();
+            if (resultSetPayment.next()){
+                Calendar date = new GregorianCalendar();
+                Timestamp timestamp = resultSetPayment.getTimestamp(4);
+                date.setTimeInMillis(timestamp.getTime());
+                paymentModel = new PaymentModel(resultSetPayment.getInt(1), resultSetPayment.getString(2), resultSetPayment.getString(3), date, resultSetPayment.getString(5), resultSetPayment.getString(6));
+            }
+            resultSetPayment.close();
+            psPayment.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setTicketModel(ticketModel);
+        responseModel.setPaymentModel(paymentModel);
+
+        if (ticketModel.getState().equals("E")){
+            responseModel.setMessage("archive");
+        }else if (ticketModel.getState().equals("A")){
+            responseModel.setMessage("active");
+        }
+
+        double a = Double.parseDouble(paymentModel.getAmount());
+
+        if (a != 0){
+            a = a*(-1);
+        }
+
+        responseModel.setMessage2(a+"");
+
+        return responseModel;
+    }
+
     @RequestMapping(value = "/getShortUserInfo", method = RequestMethod.POST)
     public @ResponseBody UserModel getShortUserInfo(@RequestParam(value="id", required=true) int id,Model model) {
         UserModel userModel = new UserModel();
@@ -326,37 +398,4 @@ public class AjaxController {
         return userModel;
     }
 
-    @RequestMapping(value = "/getShortSpaceInfo", method = RequestMethod.POST)
-    public @ResponseBody SpaceModel getShortSpaceInfo(@RequestParam(value="id", required=true) int id,Model model) {
-        SpaceModel spaceModel = null;
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-
-            String sql = "select space.id, concat(seg,  place ), state, segment_id, sensor from space join segment on segment.id = space.segment_id where space.id=" + id;
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                spaceModel = new SpaceModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getInt(4),resultSet.getString(5));
-            }
-            resultSet.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-        return spaceModel;
-    }
-//
-//
-//    @RequestMapping(method = RequestMethod.GET, value = "/floorstatus/")
-//    public String printFloorStatus(ModelMap model) {
-//        return "floorstatus";
-//    }
 }

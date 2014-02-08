@@ -93,4 +93,9 @@ public class URLController {
     public String printAllUsers(ModelMap model) {
         return "userdetails";
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "ticketdetails/{id}")
+    public String printTicketDetails(@PathVariable int id){
+        return "ticketinfo";
+    }
 }

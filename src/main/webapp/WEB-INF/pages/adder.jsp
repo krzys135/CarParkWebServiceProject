@@ -181,7 +181,7 @@
 </head>
 <body>
 <div id="logout">
-    <button><a href="<c:url value="/j_spring_security_logout" />">Wyloguj</a></button>
+    <button onclick="location.href='<c:url value="/j_spring_security_logout" />'">Wyloguj</button>
 </div>
 <div id="msg"></div>
 

@@ -72,7 +72,7 @@
 
 
         function getUserDetails() {
-           jq(function () {
+            jq(function () {
                 jq.post("/main/ajax/getUserInfo",
                         {id: id},
                         function (data) {
@@ -113,7 +113,13 @@
                                     } else {ticketclick="";}
                                     jq('#paymenttab').dataTable().fnAddData([data[0].accountModel.paymentModelList[i].id, data[0].accountModel.paymentModelList[i].amount , data[0].accountModel.paymentModelList[i].paid, timeConverter(data[0].accountModel.paymentModelList[i].date), ticketclick], i+1);
                                 }}
+                                if (hours   < 10) {hours   = "0"+hours;}
+                                if (minutes < 10) {minutes = "0"+minutes;}
+                                if (seconds < 10) {seconds = "0"+seconds;}
+                                var time    = hours+':'+minutes+':'+seconds;
 
+                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, data.ticketModelList[i].space_id], i+1);
+                            
                         });
             });
 
