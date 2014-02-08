@@ -25,8 +25,8 @@ public class AddController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/floor/{floor}/")
     @ResponseBody
-    public ResponseModel floor(@PathVariable Integer floor, @RequestParam(required = true, value = "place") Integer place) {
-        String sql = "call addFloor(0," + place + "," + floor + ",0,0);";
+    public ResponseModel floor(@PathVariable Integer floor) {
+        String sql = "call addFloor(0,1," + floor + ",0,0);";
         String result = null;
         Connection connection = null;
         try {
@@ -37,13 +37,13 @@ public class AddController {
                 if (resultSet.getString(1).equals("ADDED")) {
                     result = "Piętro dodane";
                 } else {
-                    result = "Piętro nie dodane";
+                    result = "Piętro nie zostało dodane";
                 }
             }
             resultSet.close();
             ps.close();
         } catch (SQLException e) {
-            result = "Piętro nie dodane";
+            result = "Piętro nie zostało dodane";
             e.printStackTrace();
         } finally {
             if (connection != null) {
@@ -73,14 +73,14 @@ public class AddController {
                 if (resultSet.getString(1).equals("ADDED")) {
                     result = "Sektor dodany";
                 } else {
-                    result = "Sektor nie dodany";
+                    result = "Sektor nie został dodany";
                 }
             }
             resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            result = "Sektor nie dodany";
+            result = "Sektor nie został dodany";
         } finally {
             if (connection != null) {
                 try {
@@ -97,10 +97,8 @@ public class AddController {
     @RequestMapping(method = RequestMethod.POST, value = "/space")
     @ResponseBody
     public ResponseModel space(@RequestParam(value = "space", required = true) String space,
-                               @RequestParam(value = "state", required = true) String state,
-                               @RequestParam(value = "segmentid", required = true) Integer segmentId,
-                               @RequestParam(value = "sensor", required = true) String sensor) {
-        String sql = "CALL addSpace('" + space + "','" + state + "'," + segmentId + ",'" + sensor + "');";
+                               @RequestParam(value = "segmentid", required = true) Integer segmentId) {
+        String sql = "CALL addSpace('" + space + "','FREE'," + segmentId + ",'0');";
         String result = null;
         Connection connection = null;
         try {
@@ -111,14 +109,14 @@ public class AddController {
                 if (resultSet.getString(1).equals("ADDED")) {
                     result = "Miejsce dodane";
                 } else {
-                    result = "Miejsce nie dodane";
+                    result = "Miejsce nie zostało dodane";
                 }
             }
             resultSet.close();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            result = "Miejsce nie dodane";
+            result = "Miejsce nie zostało dodane";
         } finally {
             if (connection != null) {
                 try {

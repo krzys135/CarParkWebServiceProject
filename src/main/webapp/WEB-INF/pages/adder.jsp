@@ -24,7 +24,7 @@
 
         jq(document).ready(function () {
 
-            jq('#number, #parkid, #floorid, #space, #segmentid').keypress(function (e) {
+            jq('#number, #floorid, #space, #segmentid').keypress(function (e) {
                 if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
                     jq('#msg').html("Wprowadź tylko liczby").show().fadeOut(6000);
                     return false;
@@ -47,16 +47,14 @@
         function addFloor() {
             jq(function () {
                 jq('#btnaddfloor').click(function () {
-                    if (jq('#number').val() != '' && jq('#parkid').val() != '') {
+                    if (jq('#number').val() != '') {
                         var n = jq('#number').val();
-                        var p = jq('#parkid').val();
                         jq.post("/add/floor/" + n + "/",
-                                {place: p},
+                                {},
                                 function (data) {
                                     jq('#msg').html(data.message).show().fadeOut(6000);
                                 });
                         jq('#number').val('');
-                        jq('#parkid').val('');
                     } else {
                         jq('#msg').html("Uzupełnij wszytkie pola").show().fadeOut(6000);
                     }
@@ -95,16 +93,12 @@
                 jq('#btnaddsspace').click(function () {
                     if (jq('#space').val() != '' && jq('#segmentid').val() != '') {
                         var space = jq('#space').val();
-                        var state = jq('#state').find(":selected").text();
                         var segmentid = jq('#segmentid').val();
-                        var sensor = jq('#sensor').find(":selected").text();
 
                         jq.post("/add/space",
                                 {
                                     space: space,
-                                    state: state,
                                     segmentid: segmentid,
-                                    sensor: sensor
                                 },
                                 function (data) {
                                     jq('#space').val('');
@@ -133,13 +127,6 @@
             <td><input type="number" name="number" id="number"></td>
             <td>
                 <div id="numbererr"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>Id parkingu:</td>
-            <td><input type="number" id="parkid" name="parkid"/></td>
-            <td>
-                <div id="parkiderr"></div>
             </td>
         </tr>
         <tr>
@@ -186,30 +173,10 @@
             </td>
         </tr>
         <tr>
-            <td>Stan miejsca</td>
-            <td>
-                <select id="state">
-                    <option value="free">FREE</option>
-                    <option value="occupied">OCCUPIED</option>
-                    <option value="reserves">RESERVED</option>
-                    <option value="disabled">DISABLED</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
             <td>Id sektora:</td>
             <td><input type="number" id="segmentid" name="segmentid"/></td>
             <td>
                 <div id="segmentiderr"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>Stan sensora:</td>
-            <td>
-                <select id="sensor">
-                    <option value="zero">0</option>
-                    <option value="one">1</option>
-                </select>
             </td>
         </tr>
         <tr>
