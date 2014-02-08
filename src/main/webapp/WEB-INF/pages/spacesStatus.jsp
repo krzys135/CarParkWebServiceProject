@@ -66,7 +66,7 @@
                                                 }
                                                 else {icon ="<p style=\"font-size:120%;color: #ff0000\"><b>•</b></p>";}
                                                 var idclick="<a href=\"/main/placestatus/place/"+data[i].id+"\">"+found+""+data[i].place+"</a>";
-                                                jq('#companies').dataTable().fnAddData([data[i].id,idclick,data[i].state,icon],i);
+                                                jq('#companies').dataTable().fnAddData([data[i].id,idclick,data[i].state,icon],i+1);
                                             }
                                         }
                                         }

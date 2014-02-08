@@ -45,7 +45,7 @@
 
 
         var fl = window.location.href;
-        var regex = new RegExp("/place/\\d");
+        var regex = new RegExp("/place/\\d{1,}");
         var sp=regex.exec(fl);
         sp = sp[0].substr(7);
 
@@ -54,12 +54,27 @@
                 jq.post("/main/ajax/getSpaceHistory",
                         {space : sp},
                         function(data){
-                            jq('#spacehist').dataTable().fnClearTable();
-                            for(var i=0;i<data.length;i++){
 
-                                var ticketclick="<a href=\"/main/userdetails/id/"+data[i].ticket_id+"\">"+data[i].user_id+"</a>";
+                            jq('#spacehist').dataTable().fnClearTable();
+
+                            for(var i=0;i<data.length;i++){
+                                var iconpr,iconnx;
+                                if(data[i].prevsensor=="0"){
+                                    iconpr ="<p style=\"font-size:120%;color: green\"><b>•</b></p>";
+                                }
+                                else {iconpr ="<p style=\"font-size:120%;color: #ff0000\"><b>•</b></p>";}
+                                if(data[i].newsensor=="0"){
+                                    iconnx ="<p style=\"font-size:120%;color: green\"><b>•</b></p>";
+                                }
+                                else {iconnx ="<p style=\"font-size:120%;color: #ff0000\"><b>•</b></p>";}
+
+
+
+
+                                var userclick="<a href=\"/main/userdetails/id/"+data[i].user_id+"\">"+data[i].user_id+"</a>";
                                 var ticketclick="<a href=\"/main/ticketdetails/id/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
-                                jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,data[i].prevsensor,data[i].newsensor,timeConverter(data[i].date),data[i].user_id,ticketclick],i);
+                                jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,iconpr,iconnx,timeConverter(data[i].date),userclick,ticketclick],i+1);
+
                             }
                         });
             });

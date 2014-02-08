@@ -43,7 +43,7 @@
                         for(var i=0;i<data.length;i++){
 
                                 var idclick="<a href=\"/main/spacesStatus/floor/"+data[i].id+"\">"+data[i].floornumber+"</a>";
-                                jq('#floors').dataTable().fnAddData([idclick,data[i].freespaces,data[i].allspaces-data[i].freespaces,data[i].allspaces],i);
+                                jq('#floors').dataTable().fnAddData([idclick,data[i].freespaces,data[i].allspaces-data[i].freespaces,data[i].allspaces],i+1);
                         }
                     });
             });

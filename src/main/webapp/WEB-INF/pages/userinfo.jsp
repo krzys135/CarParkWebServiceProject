@@ -81,7 +81,7 @@
                         function (data) {
                             jq('#paymenttab').dataTable().fnClearTable();
                             for (var i = 0; i < data.accountModel.paymentModelList.length; i++) {
-                                jq('#paymenttab').dataTable().fnAddData([data.accountModel.paymentModelList[i].id, data.accountModel.paymentModelList[i].amount , data.accountModel.paymentModelList[i].paid, timeConverter(data.accountModel.paymentModelList[i].date), data.accountModel.paymentModelList[i].ticket_id], i);
+                                jq('#paymenttab').dataTable().fnAddData([data.accountModel.paymentModelList[i].id, data.accountModel.paymentModelList[i].amount , data.accountModel.paymentModelList[i].paid, timeConverter(data.accountModel.paymentModelList[i].date), data.accountModel.paymentModelList[i].ticket_id], i+1);
                             }
                         });
             });
@@ -106,7 +106,7 @@
                                 if (seconds < 10) {seconds = "0"+seconds;}
                                 var time    = hours+':'+minutes+':'+seconds;
 
-                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, data.ticketModelList[i].space_id], i);
+                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, data.ticketModelList[i].space_id], i+1);
                             }
                         });
             });

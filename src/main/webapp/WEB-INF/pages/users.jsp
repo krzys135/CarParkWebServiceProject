@@ -62,7 +62,7 @@
                             jq('#userstab').dataTable().fnClearTable();
                             for (var i = 0; i < data.length; i++) {
                                 var emailclick = "<a href=\"/user/allinfo?email=" + data[i].email +"\">" + data[i].email + "</a>";
-                                jq('#userstab').dataTable().fnAddData([data[i].id, emailclick , data[i].accountModel.amount], i);
+                                jq('#userstab').dataTable().fnAddData([data[i].id, emailclick , data[i].accountModel.amount], i+1);
                             }
                         });
             });
