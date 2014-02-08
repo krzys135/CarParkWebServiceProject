@@ -9,24 +9,29 @@ import java.security.Principal;
 
 @Controller
 public class LoginController {
-    @RequestMapping(value="/welcome", method = RequestMethod.GET)
-    public String printWelcome(ModelMap model, Principal principal ) {
+    @RequestMapping(value = "/welcome", method = RequestMethod.GET)
+    public String printWelcome(ModelMap model, Principal principal) {
 
         String name = principal.getName();
+        String page = null;
         model.addAttribute("username", name);
         model.addAttribute("message", "Witaj na e-parkingu");
-        return "hello";
-
+        if (name.equals("b")) {
+            page = "adder";
+        } else if (name.equals("a")) {
+            page = "hello";
+        }
+        return page;
     }
 
-    @RequestMapping(value="/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(ModelMap model) {
 
         return "login";
 
     }
 
-    @RequestMapping(value="/loginfailed", method = RequestMethod.GET)
+    @RequestMapping(value = "/loginfailed", method = RequestMethod.GET)
     public String loginerror(ModelMap model) {
 
         model.addAttribute("error", "true");
@@ -34,7 +39,7 @@ public class LoginController {
 
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(ModelMap model) {
 
         return "login";

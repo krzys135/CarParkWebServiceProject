@@ -130,8 +130,4 @@ public class AddController {
         return responseModel;
     }
 
-    @RequestMapping(value = "/page", method = RequestMethod.GET)
-    public String printAllUserInfo(ModelMap modelMap){
-        return "adder";
-    }
 }
