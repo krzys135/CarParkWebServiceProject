@@ -11,20 +11,27 @@
         var jq = jQuery.noConflict();
     </script>
 
+    <script>
+        jq(function() {
+            jq("#userlist").click(function(){
+                jq("#msg").load("users.jsp");
+            });
+        });
+    </script>
 </head>
 
 <body>
 
 <div>
     <ul id="menu">
-        <li><button><a href="/user/table">User list</a></button></li>
-        <li><button><a href="/main/floorstatus/">Car park</a></button></li>
+        <li><button id="userlist" onclick="location.href='/user/table'">User list</button></li>
+        <li><button onclick="location.href='/main/floorstatus/'">Car park</button></li>
     </ul>
 </div>
 
 <div id="msg"></div>
 
-<button><a href="<c:url value="/j_spring_security_logout" />">Logout</a></button>
+<button onclick="location.href='<c:url value="/j_spring_security_logout" />'">Logout</button>
 
 </body>
 

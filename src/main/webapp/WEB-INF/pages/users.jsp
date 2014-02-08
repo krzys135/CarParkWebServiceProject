@@ -72,6 +72,7 @@
 
 </head>
 <body>
+<h3>Users</h3>
 <div id="users">
     <table id="userstab" class="display">
         <thead>
