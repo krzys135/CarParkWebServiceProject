@@ -42,6 +42,13 @@
                     "bJQueryUI": true
                 });
             });
+
+        jQuery(document).ready(function ($) {
+            $("#ticketstab").dataTable({
+                "sPaginationType": "full_numbers",
+                "bJQueryUI": true
+            });
+        });
         getUserDetails();
         myVar = setInterval(function () {
             getUserDetails()
@@ -65,6 +72,7 @@
                         });
             });
 
+
             jq(function () {
                 jq.post("/main/ajax/getUserInfo",
                         {id: id},
@@ -87,13 +95,29 @@
                             }
                         });
             });
+
+            jq(function () {
+                jq.post("/main/ajax/getShortUserInfo",
+                        {id: id},
+                        function (data) {
+                            jq('#shortinfo').html("ID: " + data.id+"     Email: "+data.email+"   Amount:<b>"+data.accountModel.amount+"</b> zł");
+
+                        });
+            });
+
+
+
         }
     </script>
 </head>
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
-
+        <div id = "shortinfo">
+        Loading...
+        </div>
+        <br>
+        Tickets<br>
             <div id="tickets">
                 <table id="ticketstab" class="display">
                     <thead>
@@ -116,6 +140,8 @@
                     </tbody>
                 </table>
             </div>
+        <br>
+        Payment activities<br>
         <div id="payment">
             <table id="paymenttab" class="display">
                 <thead>

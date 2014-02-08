@@ -231,6 +231,49 @@ public class AjaxController {
         }
         return userModel;
     }
+
+
+
+    @RequestMapping(value = "/getShortUserInfo", method = RequestMethod.POST)
+    public @ResponseBody UserModel getShortUserInfo(@RequestParam(value="id", required=true) int id,Model model) {
+        UserModel userModel = new UserModel();
+        AccountModel accountModel = new AccountModel();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+
+            String sqlE = "select email from user where id=" + id;
+            PreparedStatement psE = connection.prepareStatement(sqlE);
+            ResultSet resultSetE = psE.executeQuery();
+            if (resultSetE.next()) {
+                userModel.setEmail(resultSetE.getString(1));
+            }
+            resultSetE.close();
+            psE.close();
+
+            String sqlA = "select amount from budget where user_id=" + id;
+            PreparedStatement psA = connection.prepareStatement(sqlA);
+            ResultSet resultSetA = psA.executeQuery();
+            if (resultSetA.next()) {
+                accountModel.setAmount(resultSetA.getDouble(1));
+            }
+            resultSetA.close();
+            psA.close();
+
+            userModel.setId(id);
+            userModel.setAccountModel(accountModel);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModel;
+    }
 //
 //
 //    @RequestMapping(method = RequestMethod.GET, value = "/floorstatus/")
