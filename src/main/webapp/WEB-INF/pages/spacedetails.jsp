@@ -47,14 +47,16 @@
         var fl = window.location.href;
         var regex = new RegExp("/place/\\d{1,}");
         var sp=regex.exec(fl);
-        sp = sp[0].substr(7);
 
+        if(sp!=null) {
+        sp = sp[0].substr(7);
+        }
+        else {sp =-1;}
         function getSpaceHistory() {
             jq(function() {
                 jq.post("/main/ajax/getSpaceHistory",
                         {space : sp},
                         function(data){
-
                             jq('#spacehist').dataTable().fnClearTable();
 
                             for(var i=0;i<data.length;i++){
@@ -73,7 +75,8 @@
 
                                 var userclick="<a href=\"/main/userdetails/id/"+data[i].user_id+"\">"+data[i].user_id+"</a>";
                                 var ticketclick="<a href=\"/main/ticketdetails/id/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
-                                jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,iconpr,iconnx,timeConverter(data[i].date),userclick,ticketclick],i+1);
+                                var spaceclick="<a href=\"/main/placestatus/place/"+data[i].space_id+"\">"+data[i].space_id+"</a>";
+                                jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,iconpr,iconnx,timeConverter(data[i].date),userclick,ticketclick,spaceclick],i+1);
 
                             }
                         });
@@ -94,10 +97,12 @@
                 <th>Date</th>
                 <th>User</th>
                 <th>Ticket</th>
+                <th>Space</th>
             </tr>
             </thead>
             <tbody class="tbl">
             <tr>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

@@ -132,9 +132,15 @@ public class AjaxController {
 
 
     @RequestMapping(value = "/getSpaceHistory", method = RequestMethod.POST)
-    public @ResponseBody  List<SpacelogModel> getSpaceHistory(@RequestParam(value="space", required=true) String space,Model model) {
+    public @ResponseBody  List<SpacelogModel> getSpaceHistory(@RequestParam(value="space", required=false) int space,Model model) {
 
-        String sql = "select * from spacelog where space_id = "+space+" order by date desc";
+        String sql = "";
+        if(space != -1){
+            sql="select * from spacelog where space_id = "+space+" order by date desc";
+        } else {
+            sql="select * from spacelog";
+        }
+
         Connection connection = null;
         List<SpacelogModel> list = new ArrayList<SpacelogModel>();
         try {

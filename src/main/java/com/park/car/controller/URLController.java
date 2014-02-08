@@ -69,12 +69,28 @@ public class URLController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/placestatus/place/{pl}")
-    public String printPlaceStatus(ModelMap model,@PathVariable int pl) {
+         public String printPlaceStatus(ModelMap model,@PathVariable int pl) {
+        return "spacedetails";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/placestatus/place/")
+    public String printPlacesHistory(ModelMap model) {
         return "spacedetails";
     }
 
     @RequestMapping(value = "/cashsensor", method = RequestMethod.GET)
     public String addCashAndChangeSensor(){
         return "cashandsensor";
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/userdetails/id/{id}")
+    public String printUserDetails(ModelMap model,@PathVariable int id) {
+        return "userdetails";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/userdetails/")
+    public String printAllUsers(ModelMap model) {
+        return "userdetails";
     }
 }
