@@ -65,10 +65,7 @@
                 jq.post("/main/ajax/getUserInfo",
                         {id: id},
                         function (data) {
-                            jq('#paymenttab').dataTable().fnClearTable();
-                            for (var i = 0; i < data.accountModel.paymentModelList.length; i++) {
-                                jq('#paymenttab').dataTable().fnAddData([data.accountModel.paymentModelList[i].id, data.accountModel.paymentModelList[i].amount , data.accountModel.paymentModelList[i].paid, timeConverter(data.accountModel.paymentModelList[i].date), data.accountModel.paymentModelList[i].ticket_id], i+1);
-                            }
+
                         });
             });
 
@@ -90,9 +87,20 @@
                                 if (minutes < 10) {minutes = "0"+minutes;}
                                 if (seconds < 10) {seconds = "0"+seconds;}
                                 var time    = hours+':'+minutes+':'+seconds;
+                                var idclick="<a href=\"/main/placestatus/place/"+data.ticketModelList[i].space_id+"\">"+data.ticketModelList[i].space_id+"</a>";
+                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, idclick], i+1);
 
-                                jq('#ticketstab').dataTable().fnAddData([data.ticketModelList[i].id, data.ticketModelList[i].fee , time, data.ticketModelList[i].state, data.ticketModelList[i].space_id], i+1);
                             }
+
+                            jq('#paymenttab').dataTable().fnClearTable();
+                            for (var i = 0; i < data.accountModel.paymentModelList.length; i++) {
+                                var ticketclick=data.accountModel.paymentModelList[i].ticket_id;
+                                if (ticketclick!=null) {
+                                    ticketclick="<a href=\"/main/ticketdetails/id/"+data.accountModel.paymentModelList[i].ticket_id+"\">"+data.accountModel.paymentModelList[i].ticket_id+"</a>";
+                                } else {ticketclick="";}
+                                jq('#paymenttab').dataTable().fnAddData([data.accountModel.paymentModelList[i].id, data.accountModel.paymentModelList[i].amount , data.accountModel.paymentModelList[i].paid, timeConverter(data.accountModel.paymentModelList[i].date), ticketclick], i+1);
+                            }
+
                         });
             });
 
