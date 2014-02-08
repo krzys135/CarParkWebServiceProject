@@ -214,64 +214,7 @@ public class UserController {
         return "userinfo";
     }
 
-    @RequestMapping(value = "/infoid", method = RequestMethod.POST)
-    @ResponseBody
-    public UserModel infoId(@RequestParam(value = "id", required = true) Integer id) {
-        UserModel userModel = new UserModel();
-        AccountModel accountModel;
-        List<TicketModel> ticketModelList = new ArrayList<TicketModel>();
 
-        String sql = "select * from ticket where user_id=" + id + "";
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet resultSet = ps.executeQuery();
-            while (resultSet.next()) {
-                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
-
-                String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + ticketModel.getId();
-                PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
-                ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
-                if (resultSetDurationSeconds.next()) {
-                    ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
-                }
-
-                resultSetDurationSeconds.close();
-                psDurationSeconds.close();
-                ticketModelList.add(ticketModel);
-            }
-            resultSet.close();
-            ps.close();
-
-            String sqlE = "select email from user where id=" + id;
-            PreparedStatement psE = connection.prepareStatement(sqlE);
-            ResultSet resultSetE = psE.executeQuery();
-            if (resultSetE.next()) {
-                userModel.setEmail(resultSetE.getString(1));
-            }
-            resultSetE.close();
-            psE.close();
-
-            DatabaseController controller = new DatabaseController();
-            controller.setDataSource(dataSource);
-            accountModel = controller.accountInformation(userModel.getEmail());
-
-            userModel.setId(id);
-            userModel.setTicketModelList(ticketModelList);
-            userModel.setAccountModel(accountModel);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-        return userModel;
-    }
 
     @RequestMapping(value = "/shinfoid", method = RequestMethod.POST)
     @ResponseBody

@@ -1,8 +1,6 @@
 package com.springapp.mvc;
-import com.park.car.model.FloorModel;
-import com.park.car.model.SegmentModel;
-import com.park.car.model.SpaceModel;
-import com.park.car.model.SpacelogModel;
+import com.park.car.controller.DatabaseController;
+import com.park.car.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -163,6 +161,75 @@ public class AjaxController {
         }
         return list;
 
+    }
+
+
+    @RequestMapping(value = "/getUserInfo", method = RequestMethod.POST)
+    public @ResponseBody UserModel getUserInfo(@RequestParam(value="id", required=false) int id,Model model) {
+
+        String sql = "";
+        if(id != -1){
+            sql="select * from ticket where user_id=" + id + "";
+        } else {
+            sql="select 'DUPA' from dual";
+        }
+
+
+        UserModel userModel = new UserModel();
+        AccountModel accountModel;
+        List<TicketModel> ticketModelList = new ArrayList<TicketModel>();
+
+
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                TicketModel ticketModel = new TicketModel(resultSet.getInt(1), resultSet.getDouble(2), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6));
+
+                String sqlDurationSeconds = "select time_to_sec(duration) from ticket where id =" + ticketModel.getId();
+                PreparedStatement psDurationSeconds = connection.prepareStatement(sqlDurationSeconds);
+                ResultSet resultSetDurationSeconds = psDurationSeconds.executeQuery();
+                if (resultSetDurationSeconds.next()) {
+                    ticketModel.setDurationSeconds(resultSetDurationSeconds.getLong(1));
+                }
+
+                resultSetDurationSeconds.close();
+                psDurationSeconds.close();
+                ticketModelList.add(ticketModel);
+            }
+            resultSet.close();
+            ps.close();
+
+            String sqlE = "select email from user where id=" + id;
+            PreparedStatement psE = connection.prepareStatement(sqlE);
+            ResultSet resultSetE = psE.executeQuery();
+            if (resultSetE.next()) {
+                userModel.setEmail(resultSetE.getString(1));
+            }
+            resultSetE.close();
+            psE.close();
+
+            DatabaseController controller = new DatabaseController();
+            controller.setDataSource(dataSource);
+            accountModel = controller.accountInformation(userModel.getEmail());
+
+            userModel.setId(id);
+            userModel.setTicketModelList(ticketModelList);
+            userModel.setAccountModel(accountModel);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return userModel;
     }
 //
 //

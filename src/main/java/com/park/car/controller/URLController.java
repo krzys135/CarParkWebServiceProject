@@ -84,7 +84,7 @@ public class URLController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/userdetails/id/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/userdetails/{id}")
     public String printUserDetails(ModelMap model,@PathVariable int id) {
         return "userdetails";
     }
