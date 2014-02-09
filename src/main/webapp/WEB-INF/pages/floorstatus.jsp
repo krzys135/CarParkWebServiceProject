@@ -53,6 +53,7 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <h3>Floors</h3><br>
         <table id="floors" class="display">
             <thead>
             <tr>

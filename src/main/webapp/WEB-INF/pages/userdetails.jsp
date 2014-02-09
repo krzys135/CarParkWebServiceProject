@@ -144,12 +144,12 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <h3>Users details</h3>
         <div id = "tohide">
         <div id = "shortinfo">
         Loading...
         </div>
-        <br>
-        Tickets<br>
+        <br><h3>Tickets</h3><br>
             <div id="tickets">
                 <table id="ticketstab" class="display">
                     <thead>
@@ -172,8 +172,7 @@
                     </tbody>
                 </table>
             </div>
-        <br>
-        Payment activities<br>
+        <br><h3>Payment activities</h3><br>
         <div id="payment">
             <table id="paymenttab" class="display">
                 <thead>
