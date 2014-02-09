@@ -86,15 +86,16 @@
                         {id: sp},
                         function (data) {
                             var userclick="<a href=\"/main/userdetails/"+data.user_id+"\">"+data.user_id+"</a>";
-                            var ticketclick="<a href=\"/main/ticketdetails/"+data.ticket_id+"\">"+data.ticket_id+"</a>";
+                            var ticketclick=" TicketID: <a href=\"/main/ticketdetails/"+data.ticket_id+"\">"+data.ticket_id+"</a>";
                             var type = "";
                             if(data.ticket_id== null){
                                 type = "Recharge";
                             } else {
                                 type = "Charge"
+                                ticketclick = "";
                             }
                             if(data.id!=null){
-                            jq('#shortinfo').html("<h3>ID: "+data.id + " Date: "+timeConverter(data.tstmp) + " Type: "+type+" Amount: " + data.amount + " Paid: " + data.paid+" UserID: "+ userclick + " TicketID: "+ ticketclick +"</h3>");
+                            jq('#shortinfo').html("<h3>ID: "+data.id + " Date: "+timeConverter(data.tstmp) + " Type: "+type+" Amount: " + data.amount + " Paid: " + data.paid+" UserID: "+ userclick + ticketclick +"</h3>");
                             }
                             else  jq('#shortinfo').html("");
                         });
