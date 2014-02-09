@@ -16,9 +16,9 @@ public class LoginController {
         String page = null;
         model.addAttribute("username", name);
         model.addAttribute("message", "Witaj na e-parkingu");
-        if (name.equals("b")) {
+        if (name.equals("user")) {
             page = "adder";
-        } else if (name.equals("a")) {
+        } else if (name.equals("admin")) {
             page = "hello";
         }
         return page;
