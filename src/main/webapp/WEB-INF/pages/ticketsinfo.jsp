@@ -72,15 +72,7 @@
 <body id="dt_example">
 <div id="container">
  <div id="demo_jui">
-     <div>
-         <ul id="menu">
-             <li><button id="userlist" onclick="location.href='/main/userdetails/'">User list</button></li>
-             <li><button id="floor" onclick="location.href='/main/floorstatus/'">Car park</button></li>
-             <li><button onclick="location.href='/main/ticketsdetails'">Tickets</button> </li>
-             <li><button id="paynemt" onclick="location.href='/main/paymentdetails'">Payments</button> </li>
-             <li><button onclick="location.href='<c:url value="/j_spring_security_logout" />'">Logout</button></li>
-         </ul>
-     </div><br>
+     <%@include file="menu.jsp"%>
 <h3>Tickets</h3>
 <div id="tickets">
     <table id="ticketstab" class="display">

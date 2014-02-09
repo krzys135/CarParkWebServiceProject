@@ -4,6 +4,7 @@
 <html>
 <head>
     <link href="<c:url value="/resources/css/style.css" />" rel="stylesheet">
+    <link href="<c:url value="/resources/css/adder_style.css" />" rel="stylesheet">
     <script src="<c:url value="/resources/js/jquery-1.4.4.min.js" />"  type="text/javascript"></script>
     <script src="<c:url value="/resources/js/jquery.dataTables.min.js" />"  type="text/javascript"></script>
     <script src="<c:url value="/resources/js/jquery-ui-1.10.3.custom.min.js" />"  type="text/javascript"></script>
@@ -105,11 +106,12 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <%@include file="menu.jsp"%><br>
         <div id = "shortinfo">
             Loading...
         </div>
         <br>
-        <h3>Users details</h3>
+        <h3>Payment details</h3>
         <br>
         <table id="paymenttabs" class="display">
             <thead>
