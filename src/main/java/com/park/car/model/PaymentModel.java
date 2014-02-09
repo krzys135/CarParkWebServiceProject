@@ -1,5 +1,6 @@
 package com.park.car.model;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 public class PaymentModel {
@@ -7,6 +8,7 @@ public class PaymentModel {
     private String amount, paid;
     private Calendar date;
     private String ticket_id, user_id;
+    private Timestamp tstmp;
 
     public PaymentModel(Integer id, String amount, String paid, Calendar date, String ticket_id, String user_id) {
         this.id = id;
@@ -15,6 +17,23 @@ public class PaymentModel {
         this.date = date;
         this.ticket_id = ticket_id;
         this.user_id = user_id;
+    }
+
+    public PaymentModel(Integer id, String amount, String paid, String ticket_id, String user_id, Timestamp tstmp) {
+        this.id = id;
+        this.amount = amount;
+        this.paid = paid;
+        this.ticket_id = ticket_id;
+        this.user_id = user_id;
+        this.tstmp = tstmp;
+    }
+
+    public Timestamp getTstmp() {
+        return tstmp;
+    }
+
+    public void setTstmp(Timestamp tstmp) {
+        this.tstmp = tstmp;
     }
 
     public Integer getId() {

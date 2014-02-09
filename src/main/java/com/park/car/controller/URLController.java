@@ -94,8 +94,13 @@ public class URLController {
         return "userdetails";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "ticketdetails/{id}")
-    public String printTicketDetails(@PathVariable int id){
-        return "ticketinfo";
+    @RequestMapping(method = RequestMethod.GET, value = "paymentdetails/{id}")
+    public String printPaymentDetails(@PathVariable int id){
+        return "paymentsdetails";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "paymentdetails/")
+    public String printTicketDetails(){
+        return "paymentsdetails";
     }
 }

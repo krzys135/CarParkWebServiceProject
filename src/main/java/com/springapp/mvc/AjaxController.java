@@ -426,4 +426,64 @@ public class AjaxController {
         }
         return spaceModel;
     }
+
+
+    @RequestMapping(value = "/getPayments", method = RequestMethod.POST)
+    public @ResponseBody List<PaymentModel> getPayments(){
+        String sql = "SELECT * FROM payment";
+        Connection connection = null;
+        List<PaymentModel> paymentModels = new ArrayList<PaymentModel>();
+        try {
+            connection = dataSource.getConnection();
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            while (resultSet.next()) {
+                paymentModels.add(new PaymentModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(5),resultSet.getString(6),resultSet.getTimestamp(4)));
+            }
+            resultSet.close();
+            ps.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return paymentModels;
+    }
+
+    @RequestMapping(value = "/getPaymentsSh", method = RequestMethod.POST)
+    public @ResponseBody PaymentModel getPaymentsSh(@RequestParam(value="id", required=true) int id,Model model) {
+        String sql = "SELECT * FROM payment where id = "+id;
+        Connection connection = null;
+        PaymentModel paymentModel =null;
+        try {
+            connection = dataSource.getConnection();
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                paymentModel = new PaymentModel(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(5),resultSet.getString(6),resultSet.getTimestamp(4));
+            }
+            resultSet.close();
+            ps.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return paymentModel;
+    }
+
 }
