@@ -52,6 +52,9 @@
         sp = sp[0].substr(7);
         }
         else {sp =-1;}
+        if(id==-1){
+            jq("#shortinfo").css('display', 'none');
+        }
         function getSpaceHistory() {
             jq(function() {
                 jq.post("/main/ajax/getSpaceHistory",
