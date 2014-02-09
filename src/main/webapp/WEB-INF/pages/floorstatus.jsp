@@ -4,6 +4,7 @@
 <html>
 <head>
     <link href="<c:url value="/resources/css/style.css" />" rel="stylesheet">
+    <link href="<c:url value="/resources/css/adder_style.css" />" rel="stylesheet">
     <script src="<c:url value="/resources/js/jquery-1.4.4.min.js" />"  type="text/javascript"></script>
     <script src="<c:url value="/resources/js/jquery.dataTables.min.js" />"  type="text/javascript"></script>
     <script src="<c:url value="/resources/js/jquery-ui-1.10.3.custom.min.js" />"  type="text/javascript"></script>
@@ -53,7 +54,16 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
-        <h3>Floors</h3><br>
+        <div>
+            <ul id="menu">
+                <li><button id="userlist" onclick="location.href='/main/userdetails/'">User list</button></li>
+                <li><button id="floor" onclick="location.href='/main/floorstatus/'">Car park</button></li>
+                <li><button id="tickets" onclick="location.href='/main/ticketsdetails'">Tickets</button> </li>
+                <li><button id="paynemt" onclick="location.href='/main/paymentdetails'">Payments</button> </li>
+                <li><button onclick="location.href='<c:url value="/j_spring_security_logout" />'">Logout</button></li>
+            </ul>
+        </div><br>
+        <h3>Floors</h3>
         <table id="floors" class="display">
             <thead>
             <tr>
