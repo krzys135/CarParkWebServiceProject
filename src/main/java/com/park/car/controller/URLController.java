@@ -94,7 +94,7 @@ public class URLController {
         return "userdetails";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "ticketdetails/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/ticketdetails/{id}")
     public String printTicketDetails(@PathVariable int id){
         return "ticketinfo";
     }
@@ -104,12 +104,12 @@ public class URLController {
         return "ticketsinfo";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "paymentdetails/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/paymentdetails/{id}")
     public String printPaymentDetails(@PathVariable int id){
         return "paymentsdetails";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "paymentdetails/")
+    @RequestMapping(method = RequestMethod.GET, value = "/paymentdetails")
     public String printTicketDetails(){
         return "paymentsdetails";
     }

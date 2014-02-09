@@ -154,7 +154,7 @@
                 <li><button onclick="location.href='<c:url value="/j_spring_security_logout" />'">Logout</button></li>
             </ul>
         </div><br>
-        <h3>Users details</h3>
+        <h3>Users</h3>
         <div id = "tohide">
         <div id = "shortinfo">
         Loading...

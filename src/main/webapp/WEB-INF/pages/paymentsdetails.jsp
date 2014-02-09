@@ -109,6 +109,8 @@
             Loading...
         </div>
         <br>
+        <h3>Users details</h3>
+        <br>
         <table id="paymenttabs" class="display">
             <thead>
             <tr>
