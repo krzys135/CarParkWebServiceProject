@@ -110,7 +110,7 @@
                                 for (var i = 0; i < data[0].accountModel.paymentModelList.length; i++) {
                                     var ticketclick=data[0].accountModel.paymentModelList[i].ticket_id;
                                     if (ticketclick!=null) {
-                                        ticketclick="<a href=\"/main/ticketdetails/id/"+data[0].accountModel.paymentModelList[i].ticket_id+"\">"+data[0].accountModel.paymentModelList[i].ticket_id+"</a>";
+                                        ticketclick="<a href=\"/main/ticketdetails/"+data[0].accountModel.paymentModelList[i].ticket_id+"\">"+data[0].accountModel.paymentModelList[i].ticket_id+"</a>";
                                     } else {ticketclick="";}
                                     jq('#paymenttab').dataTable().fnAddData([data[0].accountModel.paymentModelList[i].id, data[0].accountModel.paymentModelList[i].amount , data[0].accountModel.paymentModelList[i].paid, timeConverter(data[0].accountModel.paymentModelList[i].date), ticketclick], i+1);
                                 }}
