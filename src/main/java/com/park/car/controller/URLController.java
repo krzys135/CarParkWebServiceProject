@@ -103,4 +103,9 @@ public class URLController {
     public String printTicketDetails(){
         return "paymentsdetails";
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "ticketdetails/{id}")
+    public String printTicketDetails(@PathVariable int id){
+        return "ticketinfo";
+    }
 }
