@@ -295,6 +295,7 @@ public class AjaxController {
         Connection connection = null;
         TicketModel ticketModel = null;
         PaymentModel paymentModel = null;
+        ResponseModel responseModel = new ResponseModel();
         try {
             connection = dataSource.getConnection();
 
@@ -322,6 +323,12 @@ public class AjaxController {
                 Timestamp timestamp = resultSetPayment.getTimestamp(4);
                 date.setTimeInMillis(timestamp.getTime());
                 paymentModel = new PaymentModel(resultSetPayment.getInt(1), resultSetPayment.getString(2), resultSetPayment.getString(3), date, resultSetPayment.getString(5), resultSetPayment.getString(6));
+
+                double a = resultSetPayment.getDouble(2);
+                if (a != 0){
+                    a = a*(-1);
+                }
+                responseModel.setMessage2(a+"");
             }
             resultSetPayment.close();
             psPayment.close();
@@ -336,7 +343,6 @@ public class AjaxController {
                 }
             }
         }
-        ResponseModel responseModel = new ResponseModel();
         responseModel.setTicketModel(ticketModel);
         responseModel.setPaymentModel(paymentModel);
 
@@ -345,14 +351,6 @@ public class AjaxController {
         }else if (ticketModel.getState().equals("A")){
             responseModel.setMessage("active");
         }
-
-        double a = Double.parseDouble(paymentModel.getAmount());
-
-        if (a != 0){
-            a = a*(-1);
-        }
-
-        responseModel.setMessage2(a+"");
 
         return responseModel;
     }

@@ -14,7 +14,10 @@
     <script>
         jq(function() {
             jq("#userlist").click(function(){
-                jq("#msg").load("users.jsp");
+                jq("#msg").empty().load("/main/userdetails/");
+            });
+            jq("#floor").click(function(){
+                jq("#msg").empty().load("/main/floorstatus/");
             });
         });
     </script>
@@ -24,8 +27,8 @@
 
 <div>
     <ul id="menu">
-        <li><button id="userlist" onclick="location.href='/user/table'">User list</button></li>
-        <li><button onclick="location.href='/main/floorstatus/'">Car park</button></li>
+        <li><button id="userlist" <%--onclick="location.href='/main/userdetails/'"--%>>User list</button></li>
+        <li><button id="floor" <%--onclick="location.href='/main/floorstatus/'"--%>>Car park</button></li>
     </ul>
 </div>
 
