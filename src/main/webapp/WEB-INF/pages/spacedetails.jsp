@@ -74,7 +74,7 @@
 
 
                                 var userclick="<a href=\"/main/userdetails/"+data[i].user_id+"\">"+data[i].user_id+"</a>";
-                                var ticketclick="<a href=\"/main/ticketdetails/id/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
+                                var ticketclick="<a href=\"/main/ticketdetails/"+data[i].ticket_id+"\">"+data[i].ticket_id+"</a>";
                                 var spaceclick="<a href=\"/main/placestatus/place/"+data[i].space_id+"\">"+data[i].space_id+"</a>";
                                 jq('#spacehist').dataTable().fnAddData([data[i].prevstate,data[i].newstate,iconpr,iconnx,timeConverter(data[i].date),userclick,ticketclick,spaceclick],i+1);
 
