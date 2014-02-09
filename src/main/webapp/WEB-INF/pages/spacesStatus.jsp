@@ -82,6 +82,7 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <br><h3>Spaces</h3><br>
         <table id="companies" class="display">
             <thead>
             <tr>

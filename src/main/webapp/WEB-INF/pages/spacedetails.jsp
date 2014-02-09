@@ -104,6 +104,7 @@
 <body id="dt_example">
 <div id="container">
     <div id="demo_jui">
+        <h3>Space details</h3><br>
         <div id = "shortinfo">
             Loading...
         </div>

@@ -37,13 +37,14 @@
                             if (minutes < 10) {minutes = "0"+minutes;}
                             if (seconds < 10) {seconds = "0"+seconds;}
                             var time    = hours+':'+minutes+':'+seconds;
+                            var p = data.paymentModel.paid;
 
                             jq('#id').text(data.ticketModel.id);
                             jq('#state').text(data.message);
                             jq('#duration').text(time);
                             jq('#userid').text(data.ticketModel.user_id);
                             jq('#spaceid').text(data.ticketModel.space_id);
-                            jq('#paid').text(data.paymentModel.paid);
+                            jq('#paid').text(p.substr(0, p.length-1));
                             jq('#charge').text(data.message2);
                         }
                 );
