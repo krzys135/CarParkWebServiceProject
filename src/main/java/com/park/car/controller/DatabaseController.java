@@ -57,7 +57,7 @@ public class DatabaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseModel reg(@RequestBody final RegisterModel registerModel) {
+    public ResponseModel register(@RequestBody final RegisterModel registerModel) {
         String message = new String();
         String sql = "call addUser (null,'" + registerModel.getEmail() + "', MD5('" + registerModel.getPassword() + "'), '', '')";
         String sqlResponse = "SELECT * FROM user WHERE email = '" + registerModel.getEmail() + "' AND sysdate() between validfrom and validto";
